@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gruppo&family=Kodchasan:wght@200;500&family=Montserrat&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Gruppo', sans-serif;
+      color: white;
+    }
+
+    body {
+      background-color: black;
+    }
+
+    .header h1 {
+      font-size: 80px;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .percent-completed-items {
+      margin: 5px auto;
+      display: flex;
+      text-align: center;
+      gap: 30px;
+      max-width: 2000px;
+    }
+
+    .percent-completed {
+      padding: 10px;
+      font-size: 30px;
+      flex: 1;
+    }
+
+    .modules {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .module {
+      border-radius: 30px;
+      border: 3px solid rgb(47, 47, 47);
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .module-habits {
+      flex: 0 0 50%;
+      /* 4/8 width */
+    }
+
+    .module-quota {
+      flex: 0 0 12.5%;
+      /* 1/8 width */
+    }
+
+    .module-tasks {
+      flex: 0 0 30.5%;
+      /* 3/8 width */
+    }
+
+    .module-notes {
+      flex: 0 0 100%;
+      /* full width */
+    }
+
+    .current-day {
+      font-weight: bold;
+      color: blue;
+    }
+
+    .habit-day {
+      padding: 5px;
+      text-align: center;
+    }
+
+    .habit-day.habit-day-today:hover:not(.checked) {
+      background-color: aliceblue;
+      cursor: pointer;
+    }
+
+    .checked {
+      background-color: lightgreen;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 20px;
+    }
+
+    td {
+      padding: 5px;
+    }
+
+    td:first-child {
+      width: 1px;
+      font-size: 25px;
+      text-wrap: nowrap;
+    }
+
+    .bg-image {
+      position: absolute;
+      background-image: url("daybg-min.png"), repeating-linear-gradient(0deg, transparent, transparent 10px, rgba(0, 0, 0, 0.4) 10px, rgba(0, 0, 0, 0.4) 11px), repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(0, 0, 0, 0.4) 10px, rgba(0, 0, 0, 0.4) 11px);
+      top: 0px;
+      right: 0px;
+      bottom: 0px;
+      left: 0px;
+      z-index: -10;
+      background-repeat: no-repeat;
+      background-size: fit, auto, auto;
+      background-position: center;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- <div class="bg-image"></div> -->
+  <div class="header">
+    <h1>Loading...</h1>
+    <div class="percent-completed-items">
+      <div class="percent-completed">Loading...</div>
+      <div class="percent-completed">Loading...</div>
+      <div class="percent-completed">Loading...</div>
+    </div>
+  </div>
+  <div class="modules">
+    <div class="module module-habits"></div>
+    <div class="module module-quota"></div>
+    <div class="module module-tasks"></div>
+    <div class="module module-notes"></div>
+  </div>
+  <script>
+
+    function updateHeader() {
+      let bedTime = 23; // 11pm
+      let dayStart = 5; // 5am
+      const elements = document.querySelectorAll(".percent-completed-items > div");
+      if (elements.length >= 3) {
+        let now = new Date();
+        let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        let longDate = now.toLocaleDateString('en-US', options);
+        let endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, dayStart);
+        let endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        let endOfYear = new Date(now.getFullYear() + 1, 0, 1);
+        let startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), dayStart);
+
+        let totalDayMinutes = (bedTime - dayStart) * 60;
+        let currentDayMinutes = (now.getHours() * 60 + now.getMinutes()) - (dayStart * 60);
+        currentDayMinutes = currentDayMinutes < 0 ? 0 : currentDayMinutes; // Account for before day start
+        let percentDayDone = (currentDayMinutes / totalDayMinutes) * 100;
+
+        let daysInMonth = (endOfMonth - new Date(now.getFullYear(), now.getMonth(), 1)) / (1000 * 60 * 60 * 24);
+        let percentMonthDone = ((now.getDate() - 1 + now.getHours() / 24) / daysInMonth) * 100;
+
+        let daysInYear = (endOfYear - new Date(now.getFullYear(), 0, 1)) / (1000 * 60 * 60 * 24);
+        let percentYearDone = ((now - new Date(now.getFullYear(), 0, 1)) / (daysInYear * 24 * 60 * 60 * 1000)) * 100;
+
+        elements[0].textContent = percentDayDone.toFixed(2) + "%day done";
+        elements[1].textContent = percentMonthDone.toFixed(2) + "% of month done";
+        elements[2].textContent = percentYearDone.toFixed(2) + "% of year done";
+        document.querySelector(".header h1").textContent = longDate;
+      }
+    }
+
+    class HabitTracker {
+      constructor(start, days, habits) {
+        this.start = start;
+        this.days = days;
+        this.habits = habits;
+      }
+
+      build() {
+        const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+        const currentDate = new Date();
+        const currentDay = currentDate.getDay();
+        let tableHtml = '<table>';
+        let quotaHtml = tableHtml;
+        quotaHtml += `<tr><td></td></tr>`;
+
+        tableHtml += '<tr><th></th>';
+        for (let i = 0; i < dayNames.length; i++) {
+          tableHtml += `<th class="${i === currentDay ? 'current-day' : ''}">${dayNames[i]}</th>`;
+        }
+        tableHtml += '</tr>';
+
+        this.habits.forEach(habit => {
+          tableHtml += `<tr>`;
+          tableHtml += `<td>${habit}</td>`;
+          quotaHtml += `<tr>`;
+          quotaHtml += `<td>${habit}</td>`;
+
+          for (let j = 0; j < 7; j++) {
+            let className = 'habit-day';
+            if (j === currentDay) {
+              className += ' habit-day-today';
+            }
+            tableHtml += `<td class="${className}" onclick="toggleCheck(this, ${j === currentDay})"></td>`;
+          }
+
+          tableHtml += '</tr>';
+        });
+        quotaHtml += '</table>';
+        tableHtml += '</table>';
+
+        return [tableHtml, quotaHtml];
+      }
+
+      render() {
+        const moduleHabits = document.querySelector('.module-habits');
+        const moduleQuota = document.querySelector('.module-quota');
+        moduleHabits.innerHTML = this.build()[0];
+        moduleQuota.innerHTML = this.build()[1];
+      }
+    }
+
+    function toggleCheck(element, isToday) {
+      if (isToday) {
+        element.classList.toggle('checked');
+      }
+    }
+
+    let habits = ["Meditation", "Read", "Gym", "No Zaza", "Sleep 7Hrs", "LD Attempt", "LD Success", "Foreign Country", "Finish Book"]
+    new HabitTracker(new Date(), 7, habits).render();
+
+    updateHeader();
+    setInterval(updateHeader, 10000);
+  </script>
+</body>
+
+</html>
