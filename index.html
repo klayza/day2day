@@ -18,6 +18,10 @@
     }
 
     body {
+      /* background: 
+        linear-gradient(230deg, black, black, black, rgb(90, 59, 0),orange,rgb(98, 64, 0), black, black, black, black, black),
+        linear-gradient(100deg, black, black, black, rgb(90, 59, 0),orange,rgb(98, 64, 0), black, black, black, black, black); */
+      background-size: 100vw 100vh;
       background-color: black;
     }
 
@@ -52,6 +56,7 @@
       border: 3px solid rgb(47, 47, 47);
       padding: 10px;
       box-sizing: border-box;
+      background-color: rgb(255, 255, 255, 0.1);
     }
 
     .module-habits {
@@ -72,6 +77,66 @@
     .module-notes {
       flex: 0 0 100%;
       /* full width */
+    }
+
+    .module-reward {
+      /* flex: 0 0 50%; */
+      overflow: hidden;
+    }
+
+    .module-reward.locked .reward-image {
+      filter: blur(13px);
+      margin: -10px -10px -10px -10px;
+    }
+
+    .lock-icon {
+      top: 30px;
+    }
+
+    .reward-image {
+      width: 400px;
+      height: auto;
+    }
+
+    .reward-header {
+      display: flex;
+      gap: 10px;
+      /* background-color: rgb(255, 255, 255, 0.1); */
+    }
+
+    .reward-message {
+      font-size: 25px;
+      flex: 1 2px 1px;
+      margin-top: 4px;
+      margin-left: 20px;
+    }
+
+    .reward-progress {
+      flex: 1;
+      display: block;
+      display: flex;
+      height: 40px;
+      align-items: center;
+      gap: 3px
+    }
+
+    .reward-progress-complete {
+      background-color: lightgreen;
+    }
+
+    .reward-progress-incomplete {
+      background-color: rgb(255, 100, 100);
+    }
+
+    .reward-progress-complete,
+    .reward-progress-incomplete {
+      /* width: 5px; */
+      width: 100%;
+      height: calc(100% - 10px);
+      max-width: 15px;
+      height: 20px;
+      border: 1px solid black;
+      border-radius: 8px;
     }
 
     .current-day {
@@ -138,6 +203,7 @@
     <div class="module module-habits"></div>
     <div class="module module-quota"></div>
     <div class="module module-tasks"></div>
+    <div class="module module-reward"></div>
     <div class="module module-notes"></div>
   </div>
   <script>
@@ -173,6 +239,51 @@
       }
     }
 
+    class Reward {
+      constructor() {
+        this.getTodaysReward().then(rewardImageUrl => {
+          this.htmlContent = `
+        <div class='reward-header'><p class='reward-message'>Locked</p> 
+        <span class='reward-progress'>${this.getProgessBar()}</span></div>
+        <img class='reward-image' src='${rewardImageUrl}'>
+      `;
+          this.render();
+        });
+      }
+
+      getProgessBar() {
+        let totalHabits = 10;
+        let totalDone = 3;
+        let template = "<div class='reward-progress-{iORc}'></div>";
+        let result = "";
+        for (let i = 0; i < totalHabits; i++) {
+          result += template.replace("{iORc}", i < totalDone ? "complete" : "incomplete");
+        }
+        return result;
+      }
+
+      async getTodaysReward() {
+        let url = "http://127.0.0.1:5000/reward";
+        try {
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error('No image available');
+          }
+          return response.url;
+        } catch (error) {
+          console.error('Error fetching the reward image:', error);
+          return 'path/to/default/image.jpg'; // Path to a default image
+        }
+      }
+
+      render() {
+        const moduleElement = document.querySelector('.module-reward');
+        if (moduleElement) {
+          moduleElement.innerHTML = this.htmlContent;
+          moduleElement.className += " locked";
+        }
+      }
+    }
     class HabitTracker {
       constructor(start, days, habits) {
         this.start = start;
@@ -216,6 +327,7 @@
         return [tableHtml, quotaHtml];
       }
 
+
       render() {
         const moduleHabits = document.querySelector('.module-habits');
         const moduleQuota = document.querySelector('.module-quota');
@@ -230,8 +342,11 @@
       }
     }
 
+
     let habits = ["Meditation", "Read", "Gym", "No Zaza", "Sleep 7Hrs", "LD Attempt", "LD Success", "Foreign Country", "Finish Book"]
     new HabitTracker(new Date(), 7, habits).render();
+
+    new Reward().getTodaysReward();
 
     updateHeader();
     setInterval(updateHeader, 10000);
