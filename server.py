@@ -4,6 +4,9 @@ import os
 import random
 from datetime import datetime
 from flask_cors import CORS
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)  
@@ -56,13 +59,19 @@ def reward():
             return send_file(image_path, mimetype='image/jpeg')
         else:
             return "No image available", 404
+    print(directory)
 
     image_path = get_random_image_path(directory)
+    print(image_path)
     if not image_path:
         return "No image available", 404
 
     update_history(image_path)
     return send_file(image_path, mimetype='image/jpeg')
 
+@app.route('/')
+def home():
+    return send_file('./index.html')
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5621, debug=True)

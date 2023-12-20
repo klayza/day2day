@@ -208,6 +208,9 @@
   </div>
   <script>
 
+    let HOST = "127.0.0.1:5621"
+    // let HOST = "192.168.0.165:5621" DO NOT USE!!!!
+
     function updateHeader() {
       let bedTime = 23; // 11pm
       let dayStart = 5; // 5am
@@ -263,7 +266,7 @@
       }
 
       async getTodaysReward() {
-        let url = "http://127.0.0.1:5000/reward";
+        let url = `http://${HOST}/reward`;
         try {
           const response = await fetch(url);
           if (!response.ok) {
