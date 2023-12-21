@@ -208,8 +208,8 @@
   </div>
   <script>
 
-    let HOST = "127.0.0.1:5621"
-    // let HOST = "192.168.0.165:5621" DO NOT USE!!!!
+    // let HOST = "127.0.0.1:5621"
+    let HOST = "192.168.0.165:5621" 
 
     function updateHeader() {
       let bedTime = 23; // 11pm
@@ -248,7 +248,8 @@
           this.htmlContent = `
         <div class='reward-header'><p class='reward-message'>Locked</p> 
         <span class='reward-progress'>${this.getProgessBar()}</span></div>
-        <img class='reward-image' src='${rewardImageUrl}'>
+        <img class='reward-image' src='${rewardImageUrl}?time=${new Date().getTime()}'>
+
       `;
           this.render();
         });
