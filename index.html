@@ -7,186 +7,10 @@
   <title></title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="">
+  <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Gruppo&family=Kodchasan:wght@200;500&family=Montserrat&display=swap" rel="stylesheet">
-  <style>
-    * {
-      font-family: 'Gruppo', sans-serif;
-      color: white;
-    }
-
-    body {
-      /* background: 
-        linear-gradient(230deg, black, black, black, rgb(90, 59, 0),orange,rgb(98, 64, 0), black, black, black, black, black),
-        linear-gradient(100deg, black, black, black, rgb(90, 59, 0),orange,rgb(98, 64, 0), black, black, black, black, black); */
-      background-size: 100vw 100vh;
-      background-color: black;
-    }
-
-    .header h1 {
-      font-size: 80px;
-      text-align: center;
-      margin-bottom: 15px;
-    }
-
-    .percent-completed-items {
-      margin: 5px auto;
-      display: flex;
-      text-align: center;
-      gap: 30px;
-      max-width: 2000px;
-    }
-
-    .percent-completed {
-      padding: 10px;
-      font-size: 30px;
-      flex: 1;
-    }
-
-    .modules {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-
-    .module {
-      border-radius: 30px;
-      border: 3px solid rgb(47, 47, 47);
-      padding: 10px;
-      box-sizing: border-box;
-      background-color: rgb(255, 255, 255, 0.1);
-    }
-
-    .module-habits {
-      flex: 0 0 50%;
-      /* 4/8 width */
-    }
-
-    .module-quota {
-      flex: 0 0 12.5%;
-      /* 1/8 width */
-    }
-
-    .module-tasks {
-      flex: 0 0 30.5%;
-      /* 3/8 width */
-    }
-
-    .module-notes {
-      flex: 0 0 100%;
-      /* full width */
-    }
-
-    .module-reward {
-      /* flex: 0 0 50%; */
-      overflow: hidden;
-    }
-
-    .module-reward.locked .reward-image {
-      filter: blur(13px);
-      margin: -10px -10px -10px -10px;
-    }
-
-    .lock-icon {
-      top: 30px;
-    }
-
-    .reward-image {
-      width: 400px;
-      height: auto;
-    }
-
-    .reward-header {
-      display: flex;
-      gap: 10px;
-      /* background-color: rgb(255, 255, 255, 0.1); */
-    }
-
-    .reward-message {
-      font-size: 25px;
-      flex: 1 2px 1px;
-      margin-top: 4px;
-      margin-left: 20px;
-    }
-
-    .reward-progress {
-      flex: 1;
-      display: block;
-      display: flex;
-      height: 40px;
-      align-items: center;
-      gap: 3px
-    }
-
-    .reward-progress-complete {
-      background-color: lightgreen;
-    }
-
-    .reward-progress-incomplete {
-      background-color: rgb(255, 100, 100);
-    }
-
-    .reward-progress-complete,
-    .reward-progress-incomplete {
-      /* width: 5px; */
-      width: 100%;
-      height: calc(100% - 10px);
-      max-width: 15px;
-      height: 20px;
-      border: 1px solid black;
-      border-radius: 8px;
-    }
-
-    .current-day {
-      font-weight: bold;
-      color: blue;
-    }
-
-    .habit-day {
-      padding: 5px;
-      text-align: center;
-    }
-
-    .habit-day.habit-day-today:hover:not(.checked) {
-      background-color: aliceblue;
-      cursor: pointer;
-    }
-
-    .checked {
-      background-color: lightgreen;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 20px;
-    }
-
-    td {
-      padding: 5px;
-    }
-
-    td:first-child {
-      width: 1px;
-      font-size: 25px;
-      text-wrap: nowrap;
-    }
-
-    .bg-image {
-      position: absolute;
-      background-image: url("daybg-min.png"), repeating-linear-gradient(0deg, transparent, transparent 10px, rgba(0, 0, 0, 0.4) 10px, rgba(0, 0, 0, 0.4) 11px), repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(0, 0, 0, 0.4) 10px, rgba(0, 0, 0, 0.4) 11px);
-      top: 0px;
-      right: 0px;
-      bottom: 0px;
-      left: 0px;
-      z-index: -10;
-      background-repeat: no-repeat;
-      background-size: fit, auto, auto;
-      background-position: center;
-    }
-  </style>
 </head>
 
 <body>
@@ -206,10 +30,41 @@
     <div class="module module-reward"></div>
     <div class="module module-notes"></div>
   </div>
+  <dialog class="new-habit-dialog">
+    <form>
+      <label for="habit-name">Habit Name:</label>
+      <input type="text" id="habit-name" name="habit-name" placeholder="Name" required>
+      <label for="start-date">Start Date:</label>
+      <input type="date" id="start-date" name="start-date" required>
+      <fieldset>
+        <legend>Exclude Days of the Week:</legend>
+        <label><input type="checkbox" name="day" value="monday"> Monday</label>
+        <label><input type="checkbox" name="day" value="tuesday"> Tuesday</label>
+        <label><input type="checkbox" name="day" value="wednesday"> Wednesday</label>
+        <label><input type="checkbox" name="day" value="thursday"> Thursday</label>
+        <label><input type="checkbox" name="day" value="friday"> Friday</label>
+        <label><input type="checkbox" name="day" value="saturday"> Saturday</label>
+        <label><input type="checkbox" name="day" value="sunday"> Sunday</label>
+      </fieldset>
+      <label for="quota-duration">Quota Duration:</label>
+      <select id="quota-duration" name="quota-duration" required>
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="bi-weekly">Bi-weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="quarterly">Quarterly (4mo)</option>
+        <option value="semi-annually">Semi-Annually (6mo)</option>
+        <option value="yearly">Yearly (12mo)</option>
+      </select>
+      <label for="quota-amount">Quota Amount:</label>
+      <input type="number" id="quota-amount" name="quota-amount" min="1" required>
+      <button type="submit">Create Habit</button>
+    </form>
+  </dialog>
   <script>
 
     // let HOST = "127.0.0.1:5621"
-    let HOST = "192.168.0.165:5621" 
+    let HOST = "192.168.0.165:5621"
 
     function updateHeader() {
       let bedTime = 23; // 11pm
@@ -288,55 +143,201 @@
         }
       }
     }
-    class HabitTracker {
-      constructor(start, days, habits) {
+
+    class Habit {
+      constructor(name, start, history, exclusions, quota) {
+        this.name = name;
         this.start = start;
-        this.days = days;
-        this.habits = habits;
+        this.history = history;
+        this.exclusions = exclusions;
+        this.quota = quota;
       }
 
-      build() {
+      // Example
+      /*
+        {
+          "name": "Meditate",
+          "start": "12/1/2023",
+          "history": [
+            {"date":"12/1/2023", "note":"The beginning!", "done": true},
+            {"date":"12/2/2023", "note":"Tired af", "done": false}],
+          "exclusions": ["sunday"],
+          "quota": {"duration": "weekly", "amount": 6},
+        },
+      */
+
+      metQuota() {
+        let done = false;
+        const today = new Date();
+        const history = this.history;
+        const quotaAmount = this.quota.amount;
+
+        function isDateEqual(date1, date2) {
+          return date1.getDate() === date2.getDate() &&
+            date1.getMonth() === date2.getMonth() &&
+            date1.getFullYear() === date2.getFullYear();
+        }
+
+        function getWeekRange(startDate) {
+          let start = new Date(startDate);
+          let end = new Date(start);
+          end.setDate(end.getDate() + 6); // End date of the week
+          return { start, end };
+        }
+
+        switch (this.quota.duration) {
+          case "daily":
+            done = history.some(entry => isDateEqual(new Date(entry.date), today) && entry.done);
+            break;
+
+          case "weekly":
+            let startOfWeek = new Date(this.start);
+            while (startOfWeek <= today) {
+              const { start, end } = getWeekRange(startOfWeek);
+              if (today >= start && today <= end) {
+                // Count the 'done' entries within this week
+                const doneCount = history.filter(entry => {
+                  const entryDate = new Date(entry.date);
+                  return entryDate >= start && entryDate <= end && entry.done;
+                }).length;
+
+                done = doneCount >= quotaAmount;
+                break;
+              }
+              // Move to the next week
+              startOfWeek.setDate(startOfWeek.getDate() + 7);
+            }
+            break;
+
+          // Add additional cases for other durations if needed
+        }
+
+        return done;
+      }
+
+      getDone() {
+        return 3;
+      }
+
+      getStreak() {
+        // check if there any days missing in their entries from the day that this habit was started
+      }
+
+    }
+
+    class Quota {
+      constructor(habits) {
+        let tableHtml = '<table>';
+        tableHtml += '<tr><td></td></tr>';
+
+        habits.forEach(_habit => {
+          var habit = new Habit(...Object.values(_habit));
+          if (habit.quota.duration == "yearly") { return; }
+
+          let greenOrRed = habit.metQuota() ? "lightgreen" : "rgb(255, 100, 100)"
+          tableHtml += `<tr title='${habit.name}' style='background: linear-gradient(to right, ${greenOrRed} 70%, transparent 70%);'>`;
+          let done = habit.getDone();
+          let total = habit.quota.amount
+          // tableHtml += `<td>${habit.name.substr(0, 1)}</td>`;
+          tableHtml += `<td>${done}/${total}</td>`;
+          tableHtml += `<td>${habit.quota.duration}</td>`;
+          tableHtml += '</tr>';
+        })
+        tableHtml += '</table>';
+        self.html = tableHtml;
+      }
+      render() {
+        const moduleHabits = document.querySelector('.module-quota');
+        moduleHabits.innerHTML = self.html;
+      }
+    }
+
+    function getQuotaAmount(duration) {
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const quotaTable = {
+        "daily": 1,
+        "weekly": 7,
+        "bi-weekly": 14,
+        "monthly": new Date(currentYear, now.getMonth() + 1, 0).getDate(),
+        "quarterly": (() => {
+          let totalDays = 0;
+          for (let i = 0; i < 4; i++) {
+            totalDays += new Date(currentYear, now.getMonth() + i + 1, 0).getDate();
+          }
+          return totalDays;
+        })(),
+        "semi-annually": (() => {
+          let totalDays = 0;
+          for (let i = 0; i < 6; i++) {
+            totalDays += new Date(currentYear, now.getMonth() + i + 1, 0).getDate();
+          }
+          return totalDays;
+        })(),
+        "yearly": (() => {
+          return (new Date(currentYear, 12, 0)).getDate() - (new Date(currentYear, 0, 0)).getDate();
+        })()
+      };
+
+      return quotaTable[duration];
+    }
+
+    class HabitTracker {
+      constructor(habits) {
         const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
         const currentDate = new Date();
         const currentDay = currentDate.getDay();
-        let tableHtml = '<table>';
-        let quotaHtml = tableHtml;
-        quotaHtml += `<tr><td></td></tr>`;
 
+        // Build the table
+        let tableHtml = '<table>';
         tableHtml += '<tr><th></th>';
         for (let i = 0; i < dayNames.length; i++) {
           tableHtml += `<th class="${i === currentDay ? 'current-day' : ''}">${dayNames[i]}</th>`;
         }
         tableHtml += '</tr>';
 
-        this.habits.forEach(habit => {
-          tableHtml += `<tr>`;
-          tableHtml += `<td>${habit}</td>`;
-          quotaHtml += `<tr>`;
-          quotaHtml += `<td>${habit}</td>`;
+        // Loop through each habit item
+        habits.forEach(habit => {
 
+          // Will skip yearly habits and save that for another module
+          if (habit.quota.duration == "yearly") { return; }
+
+          tableHtml += `<tr>`;
+          tableHtml += `<td>${habit.name}</td>`;
+
+          // Loop through each day in the week for the habit
           for (let j = 0; j < 7; j++) {
             let className = 'habit-day';
-            if (j === currentDay) {
-              className += ' habit-day-today';
+            if (j === currentDay) { className += ' habit-day-today'; }
+
+            // Check if the history entry exists and is valid before accessing its properties
+            let historyIndex = habit.history.length - j;
+            if (historyIndex >= 0 && habit.history[historyIndex] && habit.history[historyIndex].done) {
+              className += ' checked';
             }
+
             tableHtml += `<td class="${className}" onclick="toggleCheck(this, ${j === currentDay})"></td>`;
           }
 
           tableHtml += '</tr>';
         });
-        quotaHtml += '</table>';
-        tableHtml += '</table>';
+        tableHtml += `<tr>`;
+        tableHtml += `<td><a onclick="HabitTracker.openDialog()">+</a></td>`;
+        tableHtml += '</tr>';
 
-        return [tableHtml, quotaHtml];
+
+        tableHtml += '</table>';
+        self.html = tableHtml;
       }
 
+      static openDialog() {
+        let dialog = document.querySelector(".new-habit-dialog");
+        dialog.showModal();
+      }
 
       render() {
         const moduleHabits = document.querySelector('.module-habits');
-        const moduleQuota = document.querySelector('.module-quota');
-        moduleHabits.innerHTML = this.build()[0];
-        moduleQuota.innerHTML = this.build()[1];
+        moduleHabits.innerHTML = self.html;
       }
     }
 
@@ -347,9 +348,90 @@
     }
 
 
-    let habits = ["Meditation", "Read", "Gym", "No Zaza", "Sleep 7Hrs", "LD Attempt", "LD Success", "Foreign Country", "Finish Book"]
-    new HabitTracker(new Date(), 7, habits).render();
+    function getHabitHistory() {
+      let habits = [
+        {
+          "name": "🧘‍♂️Meditate",
+          "start": "12/11/2023",
+          "history": [
+            { "date": "12/25/2023", "note": "The beginning!", "done": true },
+            { "date": "12/26/2023", "note": "Tired af", "done": true },
+            { "date": "12/28/2023", "note": "Tired af", "done": true }
+          ],
+          "exclusions": ["sunday"],
+          "quota": { "duration": "daily", "amount": 1 },
+        },
+        {
+          "name": "Travel to a Foreign Country",
+          "start": "1/1/2024",
+          "history": [],
+          "exclusions": [],
+          "quota": { "duration": "yearly", "amount": 2 },
+        },
+        {
+          "name": "📖Read Book",
+          "start": "1/1/2024",
+          "history": [],
+          "exclusions": [],
+          "quota": { "duration": "monthly", "amount": 1 },
+        },
+        {
+          "name": "🏋️Gym",
+          "start": "1/1/2024",
+          "history": [],
+          "exclusions": [],
+          "quota": { "duration": "weekly", "amount": 4 },
+        },
+        {
+          "name": "🗣️X Post",
+          "start": "1/1/2024",
+          "history": [],
+          "exclusions": ["friday", "saturday", "sunday"],
+          "quota": { "duration": "daily", "amount": 2 },
+        },
+        {
+          "name": "🚫Zaza Free",
+          "start": "1/1/2024",
+          "history": [],
+          "exclusions": [],
+          "quota": { "duration": "monthly", "amount": 30 },
+        },
+        {
+          "name": "📈Biz Work",
+          "start": "1/1/2024",
+          "history": [],
+          "exclusions": [],
+          "quota": { "duration": "weekly", "amount": 5 },
+        },
+        {
+          "name": "😴Slept 7hrs+",
+          "start": "1/1/2024",
+          "history": [],
+          "exclusions": ["friday"],
+          "quota": { "duration": "weekly", "amount": 6 },
+        },
+        {
+          "name": "🌙LD Attempt",
+          "start": "1/1/2024",
+          "history": [],
+          "exclusions": ["friday"],
+          "quota": { "duration": "weekly", "amount": 6 },
+        },
+        {
+          "name": "🌟LD Success🌟",
+          "start": "1/1/2024",
+          "history": [],
+          "exclusions": [],
+          "quota": { "duration": "monthly", "amount": 1 },
+        }
+      ];
 
+      return habits;
+    }
+
+    let habits = getHabitHistory();
+    new HabitTracker(habits).render();
+    new Quota(habits).render();
     new Reward().getTodaysReward();
 
     updateHeader();

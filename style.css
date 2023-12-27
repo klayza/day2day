@@ -1,0 +1,194 @@
+* {
+  font-family: 'Gruppo', sans-serif;
+  color: white;
+}
+
+body {
+  /* background: 
+    linear-gradient(230deg, black, black, black, rgb(90, 59, 0),orange,rgb(98, 64, 0), black, black, black, black, black),
+    linear-gradient(100deg, black, black, black, rgb(90, 59, 0),orange,rgb(98, 64, 0), black, black, black, black, black); */
+  background-size: 100vw 100vh;
+  background-color: black;
+}
+
+dialog {
+  background-color: black;
+  border: none;
+}
+
+dialog * {
+  font-size: 20px;
+}
+
+dialog::backdrop {
+  background-color: rgba(0, 0, 0, .9);
+}
+
+input, textarea, select, button {
+  background-color: rgb(49, 49, 49);
+}
+
+.header h1 {
+  font-size: 80px;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.percent-completed-items {
+  margin: 5px auto;
+  display: flex;
+  text-align: center;
+  gap: 30px;
+  max-width: 2000px;
+}
+
+.percent-completed {
+  padding: 10px;
+  font-size: 30px;
+  flex: 1;
+}
+
+.modules {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.module {
+  border-radius: 30px;
+  border: 3px solid rgb(47, 47, 47);
+  padding: 10px;
+  box-sizing: border-box;
+  /* background-color: rgb(255, 255, 255, 0.1); */
+}
+
+.module-habits {
+  flex: 0 0 50%;
+  /* 4/8 width */
+  min-width: 500px;
+}
+
+.module-quota {
+  flex: 0 0 12.5%;
+  /* 1/8 width */
+
+  text-align: center;
+}
+
+.module-tasks {
+  flex: 0 0 30.5%;
+  /* 3/8 width */
+}
+
+.module-notes {
+  flex: 0 0 100%;
+  /* full width */
+}
+
+.module-reward {
+  /* flex: 0 0 50%; */
+  overflow: hidden;
+}
+
+.module-reward.locked .reward-image {
+  filter: blur(13px);
+  margin: -10px -10px -10px -10px;
+}
+
+.lock-icon {
+  top: 30px;
+}
+
+.reward-image {
+  width: 400px;
+  height: auto;
+}
+
+.reward-header {
+  display: flex;
+  gap: 10px;
+  /* background-color: rgb(255, 255, 255, 0.1); */
+}
+
+.reward-message {
+  font-size: 25px;
+  flex: 1 2px 1px;
+  margin-top: 4px;
+  margin-left: 20px;
+}
+
+.reward-progress {
+  flex: 1;
+  display: block;
+  display: flex;
+  height: 40px;
+  align-items: center;
+  gap: 3px
+}
+
+.reward-progress-complete {
+  background-color: lightgreen;
+}
+
+.reward-progress-incomplete {
+  background-color: rgb(255, 100, 100);
+}
+
+.reward-progress-complete,
+.reward-progress-incomplete {
+  /* width: 5px; */
+  width: 100%;
+  height: calc(100% - 10px);
+  max-width: 15px;
+  height: 20px;
+  border: 1px solid black;
+  border-radius: 8px;
+}
+
+.current-day {
+  font-weight: bold;
+  color: blue;
+}
+
+.habit-day {
+  padding: 5px;
+  text-align: center;
+}
+
+.habit-day.habit-day-today:hover:not(.checked) {
+  background-color: aliceblue;
+  cursor: pointer;
+}
+
+.checked {
+  background-color: lightgreen;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 20px;
+}
+
+td {
+  padding: 5px;
+}
+
+td:first-child {
+  width: 1px;
+  font-size: 25px;
+  text-wrap: nowrap;
+}
+
+.bg-image {
+  position: absolute;
+  background-image: url("daybg-min.png"), repeating-linear-gradient(0deg, transparent, transparent 10px, rgba(0, 0, 0, 0.4) 10px, rgba(0, 0, 0, 0.4) 11px), repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(0, 0, 0, 0.4) 10px, rgba(0, 0, 0, 0.4) 11px);
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  z-index: -10;
+  background-repeat: no-repeat;
+  background-size: fit, auto, auto;
+  background-position: center;
+}
