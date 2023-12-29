@@ -4,13 +4,14 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title></title>
+  <title>day2day</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Gruppo&family=Kodchasan:wght@200;500&family=Montserrat&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="day2day.png">
 </head>
 
 <body>
@@ -23,48 +24,41 @@
       <div class="percent-completed">Loading...</div>
     </div>
   </div>
-  <div class="modules">
-    <div class="module module-habits"></div>
-    <div class="module module-quota"></div>
-    <div class="module module-tasks"></div>
-    <div class="module module-reward"></div>
-    <div class="module module-notes"></div>
+  <div class="modules hidden">
   </div>
   <dialog class="new-habit-dialog">
-    <form>
-      <label for="habit-name">Habit Name:</label>
-      <input type="text" id="habit-name" name="habit-name" placeholder="Name" required>
-      <label for="start-date">Start Date:</label>
-      <input type="date" id="start-date" name="start-date" required>
-      <fieldset>
-        <legend>Exclude Days of the Week:</legend>
-        <label><input type="checkbox" name="day" value="monday"> Monday</label>
-        <label><input type="checkbox" name="day" value="tuesday"> Tuesday</label>
-        <label><input type="checkbox" name="day" value="wednesday"> Wednesday</label>
-        <label><input type="checkbox" name="day" value="thursday"> Thursday</label>
-        <label><input type="checkbox" name="day" value="friday"> Friday</label>
-        <label><input type="checkbox" name="day" value="saturday"> Saturday</label>
-        <label><input type="checkbox" name="day" value="sunday"> Sunday</label>
-      </fieldset>
-      <label for="quota-duration">Quota Duration:</label>
-      <select id="quota-duration" name="quota-duration" required>
-        <option value="daily">Daily</option>
-        <option value="weekly">Weekly</option>
-        <option value="bi-weekly">Bi-weekly</option>
-        <option value="monthly">Monthly</option>
-        <option value="quarterly">Quarterly (4mo)</option>
-        <option value="semi-annually">Semi-Annually (6mo)</option>
-        <option value="yearly">Yearly (12mo)</option>
-      </select>
-      <label for="quota-amount">Quota Amount:</label>
-      <input type="number" id="quota-amount" name="quota-amount" min="1" required>
-      <button type="submit">Create Habit</button>
-    </form>
+    <label for="habit-name">Habit Name:</label>
+    <input type="text" id="habit-name" name="habit-name" placeholder="Name" required>
+    <label for="start-date">Start Date:</label>
+    <input type="date" id="start-date" name="start-date" required>
+    <fieldset>
+      <legend>Exclude Days of the Week:</legend>
+      <label><input type="checkbox" name="day" value="monday"> Monday</label>
+      <label><input type="checkbox" name="day" value="tuesday"> Tuesday</label>
+      <label><input type="checkbox" name="day" value="wednesday"> Wednesday</label>
+      <label><input type="checkbox" name="day" value="thursday"> Thursday</label>
+      <label><input type="checkbox" name="day" value="friday"> Friday</label>
+      <label><input type="checkbox" name="day" value="saturday"> Saturday</label>
+      <label><input type="checkbox" name="day" value="sunday"> Sunday</label>
+    </fieldset>
+    <label for="quota-duration">Quota Duration:</label>
+    <select id="quota-duration" name="quota-duration" required>
+      <option value="weekly">Weekly</option>
+      <option value="daily">Daily</option>
+      <option value="bi-weekly">Bi-weekly</option>
+      <option value="monthly">Monthly</option>
+      <option value="quarterly">Quarterly (4mo)</option>
+      <option value="semi-annually">Semi-Annually (6mo)</option>
+      <option value="yearly">Yearly (12mo)</option>
+    </select>
+    <label for="quota-amount">Quota Amount:</label>
+    <input type="number" id="quota-amount" name="quota-amount" min="1" required placeholder="e.g 5 per week">
+    <button type="button" onclick="HabitTracker.handleNewHabit()">Create Habit</button>
   </dialog>
   <script>
 
-    // let HOST = "127.0.0.1:5621"
-    let HOST = "192.168.0.165:5621"
+    let HOST = "127.0.0.1:5621" // WINDOWS server (debug)
+    // let HOST = "192.168.0.165:5621" // LINUX server (production)
 
     function updateHeader() {
       let bedTime = 23; // 11pm
@@ -96,18 +90,16 @@
         document.querySelector(".header h1").textContent = longDate;
       }
     }
+    //         Reward.getTodaysReward().then(rewardImageUrl => {
 
     class Reward {
-      constructor() {
-        this.getTodaysReward().then(rewardImageUrl => {
-          this.htmlContent = `
+      constructor(rewardImageUrl) {
+        this.className = "module-reward"
+        this.html = `
         <div class='reward-header'><p class='reward-message'>Locked</p> 
         <span class='reward-progress'>${this.getProgessBar()}</span></div>
         <img class='reward-image' src='${rewardImageUrl}?time=${new Date().getTime()}'>
-
       `;
-          this.render();
-        });
       }
 
       getProgessBar() {
@@ -121,7 +113,7 @@
         return result;
       }
 
-      async getTodaysReward() {
+      static async getTodaysReward() {
         let url = `http://${HOST}/reward`;
         try {
           const response = await fetch(url);
@@ -131,16 +123,16 @@
           return response.url;
         } catch (error) {
           console.error('Error fetching the reward image:', error);
-          return 'path/to/default/image.jpg'; // Path to a default image
+          // return 'path/to/default/image.jpg';
         }
       }
 
       render() {
-        const moduleElement = document.querySelector('.module-reward');
-        if (moduleElement) {
-          moduleElement.innerHTML = this.htmlContent;
-          moduleElement.className += " locked";
-        }
+        const modules = document.querySelector('.modules');
+        const thisModule = document.createElement('div');
+        thisModule.className = this.className += " locked module";
+        thisModule.innerHTML = this.html;
+        modules.appendChild(thisModule);
       }
     }
 
@@ -152,19 +144,6 @@
         this.exclusions = exclusions;
         this.quota = quota;
       }
-
-      // Example
-      /*
-        {
-          "name": "Meditate",
-          "start": "12/1/2023",
-          "history": [
-            {"date":"12/1/2023", "note":"The beginning!", "done": true},
-            {"date":"12/2/2023", "note":"Tired af", "done": false}],
-          "exclusions": ["sunday"],
-          "quota": {"duration": "weekly", "amount": 6},
-        },
-      */
 
       metQuota() {
         let done = false;
@@ -227,11 +206,13 @@
 
     class Quota {
       constructor(habits) {
+        this.className = "module-quota";
         let tableHtml = '<table>';
         tableHtml += '<tr><td></td></tr>';
 
-        habits.forEach(_habit => {
-          var habit = new Habit(...Object.values(_habit));
+        habits.forEach(h => {
+          var habit = new Habit(h.name, h.start, h.history, h.exclusions, h.quota);
+          console.log(habit)
           if (habit.quota.duration == "yearly") { return; }
 
           let greenOrRed = habit.metQuota() ? "lightgreen" : "rgb(255, 100, 100)"
@@ -244,11 +225,14 @@
           tableHtml += '</tr>';
         })
         tableHtml += '</table>';
-        self.html = tableHtml;
+        this.html = tableHtml;
       }
       render() {
-        const moduleHabits = document.querySelector('.module-quota');
-        moduleHabits.innerHTML = self.html;
+        const modules = document.querySelector('.modules');
+        const thisModule = document.createElement('div');
+        thisModule.className = this.className += " module";
+        thisModule.innerHTML = this.html;
+        modules.appendChild(thisModule);
       }
     }
 
@@ -284,13 +268,17 @@
 
     class HabitTracker {
       constructor(habits) {
+        this.className = "module-habits";
         const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
         const currentDate = new Date();
         const currentDay = currentDate.getDay();
+        const startOfYear = new Date(currentDate.getFullYear(), 0, 1);
+        const weekNumber = Math.ceil(((currentDate - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
 
         // Build the table
         let tableHtml = '<table>';
-        tableHtml += '<tr><th></th>';
+
+        tableHtml += `<tr><th>Week ${weekNumber} / 52</th>`;
         for (let i = 0; i < dayNames.length; i++) {
           tableHtml += `<th class="${i === currentDay ? 'current-day' : ''}">${dayNames[i]}</th>`;
         }
@@ -327,17 +315,95 @@
 
 
         tableHtml += '</table>';
-        self.html = tableHtml;
+        this.html = tableHtml;
       }
 
       static openDialog() {
         let dialog = document.querySelector(".new-habit-dialog");
+        let startDateInput = dialog.querySelector("[name='start-date']");
+
+        // Set the start date to tomorrow
+        let tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        let dateString = tomorrow.toISOString().split('T')[0]; // format as YYYY-MM-DD
+        startDateInput.value = dateString;
+
+        // Show the dialog
         dialog.showModal();
       }
 
+      static handleNewHabit() {
+        const name = document.getElementById('habit-name').value;
+        const start = document.getElementById('start-date').value;
+        const checkboxes = document.querySelectorAll('input[name="day"]:checked');
+        const exclusions = Array.from(checkboxes).map(cb => cb.value);
+        const quota = {
+          duration: document.getElementById('quota-duration').value,
+          amount: parseInt(document.getElementById('quota-amount').value, 10)
+        };
+
+        // Validation
+        if (!name.trim()) {
+          alert('Please enter a habit name.');
+          return;
+        }
+        if (!start) {
+          alert('Please enter a start date.');
+          return;
+        }
+        if (isNaN(quota.amount) || quota.amount < 1) {
+          alert('Please enter a valid quota amount.');
+          return;
+        }
+
+        let habit = new Habit(name, start, [], exclusions, quota);
+
+        HabitTracker.saveNewHabit(habit); //.then update the table and quota
+
+        // Additional functionality to add the habit to a table and update the quota 
+      }
+
+      static async getData() {
+        let url = `http://${HOST}/getHabits`;
+        try {
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error('Not ok response');
+          }
+          return response.json();
+        } catch (error) {
+          console.log("Couldn't get habit data", error)
+        }
+      }
+
+      static async saveNewHabit(habit) {
+        console.log(habit)
+        try {
+          const response = await fetch(`http://${HOST}/newHabit`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ habit }),
+          });
+
+          if (!response.ok) {
+            throw new Error('Error saving habit');
+          }
+
+          const result = await response.json();
+          return result;
+        } catch (error) {
+          console.error("Couldn't save habit", error);
+        }
+      }
+
       render() {
-        const moduleHabits = document.querySelector('.module-habits');
-        moduleHabits.innerHTML = self.html;
+        const modules = document.querySelector('.modules');
+        const thisModule = document.createElement('div');
+        thisModule.className = this.className += " module";
+        thisModule.innerHTML = this.html;
+        modules.appendChild(thisModule);
       }
     }
 
@@ -347,92 +413,57 @@
       }
     }
 
+    class day2day {
+      constructor() {
+        this.modules = []
+      }
+      async start() {
+        // Habit Tracker & Quota
+        HabitTracker.getData().then(habits => {
+          if (habits) {
+            console.log(habits)
+            let ht = new HabitTracker(habits);
+            let q = new Quota(habits);
+            ht.render();
+            q.render();
+            app.modules.push(ht);
+            app.modules.push(q);
+          }
+          else { console.log("Do something to indicate habits weren't loaded"); }
+        }).then(() => {
+          // Reward
+          Reward.getTodaysReward().then(rewardUrl => {
+            if (rewardUrl) {
+              let reward = new Reward(rewardUrl);
+              app.modules.push(reward);
+              reward.render();
+            }
+            else {
+              // We really don't care if this doesn't show up for any unknown reason
+            }
+          });
 
-    function getHabitHistory() {
-      let habits = [
-        {
-          "name": "🧘‍♂️Meditate",
-          "start": "12/11/2023",
-          "history": [
-            { "date": "12/25/2023", "note": "The beginning!", "done": true },
-            { "date": "12/26/2023", "note": "Tired af", "done": true },
-            { "date": "12/28/2023", "note": "Tired af", "done": true }
-          ],
-          "exclusions": ["sunday"],
-          "quota": { "duration": "daily", "amount": 1 },
-        },
-        {
-          "name": "Travel to a Foreign Country",
-          "start": "1/1/2024",
-          "history": [],
-          "exclusions": [],
-          "quota": { "duration": "yearly", "amount": 2 },
-        },
-        {
-          "name": "📖Read Book",
-          "start": "1/1/2024",
-          "history": [],
-          "exclusions": [],
-          "quota": { "duration": "monthly", "amount": 1 },
-        },
-        {
-          "name": "🏋️Gym",
-          "start": "1/1/2024",
-          "history": [],
-          "exclusions": [],
-          "quota": { "duration": "weekly", "amount": 4 },
-        },
-        {
-          "name": "🗣️X Post",
-          "start": "1/1/2024",
-          "history": [],
-          "exclusions": ["friday", "saturday", "sunday"],
-          "quota": { "duration": "daily", "amount": 2 },
-        },
-        {
-          "name": "🚫Zaza Free",
-          "start": "1/1/2024",
-          "history": [],
-          "exclusions": [],
-          "quota": { "duration": "monthly", "amount": 30 },
-        },
-        {
-          "name": "📈Biz Work",
-          "start": "1/1/2024",
-          "history": [],
-          "exclusions": [],
-          "quota": { "duration": "weekly", "amount": 5 },
-        },
-        {
-          "name": "😴Slept 7hrs+",
-          "start": "1/1/2024",
-          "history": [],
-          "exclusions": ["friday"],
-          "quota": { "duration": "weekly", "amount": 6 },
-        },
-        {
-          "name": "🌙LD Attempt",
-          "start": "1/1/2024",
-          "history": [],
-          "exclusions": ["friday"],
-          "quota": { "duration": "weekly", "amount": 6 },
-        },
-        {
-          "name": "🌟LD Success🌟",
-          "start": "1/1/2024",
-          "history": [],
-          "exclusions": [],
-          "quota": { "duration": "monthly", "amount": 1 },
-        }
-      ];
+        });
 
-      return habits;
+
+      }
+      render() {
+        this.modules.forEach(module => {
+          module.render();
+        });
+        document.querySelector(".modules").classList.remove("hidden");
+      }
     }
 
-    let habits = getHabitHistory();
-    new HabitTracker(habits).render();
-    new Quota(habits).render();
-    new Reward().getTodaysReward();
+    // Init the app
+    let app = new day2day();
+    app.start().then(() => {
+      app.render();
+    });
+
+
+
+
 
     updateHeader();
     setInterval(updateHeader, 10000);

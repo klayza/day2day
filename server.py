@@ -1,27 +1,30 @@
 import json
-from flask import Flask, send_file
 import os
 import random
 from datetime import datetime
 from flask_cors import CORS
 from dotenv import load_dotenv
+from flask import Flask, send_file, jsonify, request
 
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)  
+CORS(app)
 
 GOODS_DIR = os.getenv("goods")
 GOODGOODS_DIR = os.getenv("goodgoods")
+
 
 def get_random_image_path(directory):
     if not os.path.isdir(directory):
         return None
     files = [os.path.join(directory, f) for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
     return random.choice(files) if files else None
-  
+
+
 def get_date_str():
     return datetime.now().strftime("%m%d%Y")
+
 
 def update_history(img):
     history_file = "rewardHistory.json"
@@ -34,6 +37,7 @@ def update_history(img):
         f.seek(0)
         json.dump(history, f)
 
+
 def rewarded_today():
     history_file = "rewardHistory.json"
     if not os.path.exists(history_file):
@@ -43,12 +47,14 @@ def rewarded_today():
         history = json.load(f)
         return get_date_str() in history
 
+
 def get_image_from_date(dateStr):
     with open("rewardHistory.json", "r") as f:
         history = json.load(f)
         return history.get(dateStr)
 
-@app.route('/reward')
+
+@app.route("/reward")
 def reward():
     today = datetime.today().weekday()  # Monday is 0, Sunday is 6
     directory = GOODGOODS_DIR if today in [4, 5] else GOODS_DIR  # Use GOODGOODS_DIR on Friday and Saturday
@@ -56,7 +62,7 @@ def reward():
     if rewarded_today():
         image_path = get_image_from_date(get_date_str())
         if image_path:
-            return send_file(image_path, mimetype='image/jpeg')
+            return send_file(image_path, mimetype="image/jpeg")
         else:
             return "No image available", 404
     print(directory)
@@ -67,11 +73,42 @@ def reward():
         return "No image available", 404
 
     update_history(image_path)
-    return send_file(image_path, mimetype='image/jpeg')
+    return send_file(image_path, mimetype="image/jpeg")
 
-@app.route('/')
+
+@app.route("/getHabits")
+def getHabits():
+    data = []
+    if os.path.exists("habits.json"):
+        with open("habits.json", "r") as file:
+            data = json.load(file)
+    else:
+        data = []  # Empty list if the file doesn't exist
+    return jsonify(data), 200
+
+
+@app.route("/newHabit", methods=["POST"])
+def newHabit():
+    data = request.get_json()
+    habit = data["habit"]
+    habits = []
+    try:
+        with open("habits.json", "r") as f:
+            habits = json.load(f)
+    except FileNotFoundError:
+        pass
+    habits.append(habit)
+    with open("habits.json", "w") as f:
+        json.dump(habits, f, indent=4)
+    
+    return jsonify({"message": "Habit added successfully"}), 200
+
+
+@app.route("/")
 def home():
-    return send_file('./index.html')
+    return send_file("./index.html")
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5621, debug=True)
+
+if __name__ == "__main__":
+    app.run(port=5621, debug=True)  # WINDOWS
+    # app.run(host='0.0.0.0', port=5621, debug=True) # LINUX

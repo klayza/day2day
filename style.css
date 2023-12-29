@@ -164,6 +164,10 @@ input, textarea, select, button {
   background-color: lightgreen;
 }
 
+.hidden {
+  display: none;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
