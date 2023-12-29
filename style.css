@@ -153,6 +153,8 @@ input, textarea, select, button {
 .habit-day {
   padding: 5px;
   text-align: center;
+  border: 10px solid black;
+
 }
 
 .habit-day.habit-day-today:hover:not(.checked) {
@@ -162,6 +164,7 @@ input, textarea, select, button {
 
 .checked {
   background-color: lightgreen;
+  border-radius: 8px;
 }
 
 .hidden {
@@ -195,4 +198,47 @@ td:first-child {
   background-repeat: no-repeat;
   background-size: fit, auto, auto;
   background-position: center;
+}
+
+.habit-row {
+  height: 43px;
+}
+
+.habit-row td {
+  text-align: left;
+}
+
+.habit-row:first-child {
+  margin-top: 21px;
+}
+
+.habit-tracker-footer {
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  border-radius: 20px;
+  text-align: center;
+  gap: 10px;
+}
+
+.habit-tracker-footer a {
+  flex: 1;
+  background: linear-gradient(to top, rgb(26, 27, 27), rgb(14, 15, 15));
+  border-radius: 20px;
+  padding: 8px;
+  text-align: center;
+
+  /* padding: 10px 5px 0px 5px; */
+}
+
+.habit-tracker-footer a:hover {
+  cursor: pointer;
+  background-color: rgb(20, 20, 20);
+}
+
+.habit-tracker-footer a:nth-child(2) {
+  background: linear-gradient(to top, rgb(26, 27, 27), rgb(11, 24, 4));
+  color: lightgreen;
+  /* text-align: right; */
+  /* display: none; */
 }
