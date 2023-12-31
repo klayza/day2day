@@ -560,12 +560,14 @@ class day2day {
       Mood: true, // questions with range inputs
       Tasks: true, // the shit 
       Summary: true, // a summary of shit you should probably do
+      History: true, // a wider view of your entries
       Stats: true, // some insights from your habits, mood, etc
       Travel: true, // a travel checklist, and maybe map
       Mantra: true, // to keep that ideal self present
       Quotes: true, // random inspirational quotes
       Word: true, // Word of the day
       Baseline: true, // Keep yourself grounded
+      Highlights: true, // Upload a pic that captures the highlight of a month
     }
   }
   async start() {
