@@ -25,7 +25,7 @@ function updateHeader() {
     let daysInYear = (endOfYear - new Date(now.getFullYear(), 0, 1)) / (1000 * 60 * 60 * 24);
     let percentYearDone = ((now - new Date(now.getFullYear(), 0, 1)) / (daysInYear * 24 * 60 * 60 * 1000)) * 100;
 
-    elements[0].textContent = percentDayDone.toFixed(2) + "%day done";
+    elements[0].textContent = percentDayDone.toFixed(2) + "% day done";
     elements[1].textContent = percentMonthDone.toFixed(2) + "% of month done";
     elements[2].textContent = percentYearDone.toFixed(2) + "% of year done";
     document.querySelector(".header h1").textContent = longDate;
@@ -36,16 +36,27 @@ function updateHeader() {
 class Reward {
   constructor(rewardImageUrl) {
     this.className = "module-reward"
+    this.goal = 1;
     this.html = `
-    <div class='reward-header'><p class='reward-message'>Locked</p> 
-    <span class='reward-progress'>${this.getProgessBar()}</span></div>
+    ${this.getButton()}
+    ${this.getHeader()}
     <img class='reward-image' src='${rewardImageUrl}?time=${new Date().getTime()}'>
   `;
   }
 
-  getProgessBar() {
-    let totalHabits = 10;
-    let totalDone = 3;
+  getButton() {
+    return `<div class='unlock-button ${!this.canUnlock() ? "hidden" : ""}' onclick='app.Reward.unlock()'>Unlock</div>`;
+  }
+
+  getHeader() {
+    return `<div class='reward-header'><p class='reward-message'>Locked</p> 
+    <span class='reward-progress'>${this.getProgressBar()}</span></div>`;
+  }
+
+  getProgressBar() {
+    // let totalHabits = app.HabitTracker.habits.length;
+    let totalHabits = this.goal;
+    let totalDone = app.Quota.getDone().length;
     let template = "<div class='reward-progress-{iORc}'></div>";
     let result = "";
     for (let i = 0; i < totalHabits; i++) {
@@ -68,6 +79,31 @@ class Reward {
     }
   }
 
+  // Check if the reward can be unclocked
+  canUnlock() {
+    return app.Quota.getDone().length >= this.goal;
+  }
+
+  unlock() {
+    document.querySelector('.unlock-button').classList.add('hidden');
+    document.querySelector('.reward-message').textContent = 'Unlocked';
+    document.querySelector('.module-reward').classList.remove('locked');
+  }
+
+  update() {
+    let newHtml = `${this.getButton()}${this.getHeader()}`;
+    let oldElements = document.querySelectorAll(".reward-header, .unlock-button");
+
+    // Remove the old elements
+    oldElements.forEach(element => {
+      element.parentNode.removeChild(element);
+    });
+
+    // Prepend the newHtml to the .module-reward container
+    let moduleReward = document.querySelector(".module-reward");
+    moduleReward.insertAdjacentHTML('afterbegin', newHtml);
+  }
+
   render() {
     const modules = document.querySelector('.modules');
     const thisModule = document.createElement('div');
@@ -78,13 +114,15 @@ class Reward {
 }
 
 class Habit {
-  constructor(name, start, history, exclusions, quota) {
+  constructor(name, start, history, exclusions, quota, id = 0) {
     this.name = name;
+    this.id = id;
     this.start = start;
     this.history = history;
     this.exclusions = exclusions;
     this.quota = quota;
   }
+
 
   metQuota() {
     let done = false;
@@ -98,51 +136,114 @@ class Habit {
         date1.getFullYear() === date2.getFullYear();
     }
 
-    function getWeekRange(startDate) {
-      let start = new Date(startDate);
-      let end = new Date(start);
-      end.setDate(end.getDate() + 6); // End date of the week
-      return { start, end };
-    }
-
+    // Based on the duration of the quota we find if they completed their quota.
+    // | NYI | Daily will be different because we will have them click the box x amount of times until it completes
     switch (this.quota.duration) {
       case "daily":
         done = history.some(entry => isDateEqual(new Date(entry.date), today) && entry.done);
         break;
 
-      case "weekly":
-        let startOfWeek = new Date(this.start);
-        while (startOfWeek <= today) {
-          const { start, end } = getWeekRange(startOfWeek);
-          if (today >= start && today <= end) {
-            // Count the 'done' entries within this week
-            const doneCount = history.filter(entry => {
-              const entryDate = new Date(entry.date);
-              return entryDate >= start && entryDate <= end && entry.done;
-            }).length;
-
-            done = doneCount >= quotaAmount;
-            break;
-          }
-          // Move to the next week
-          startOfWeek.setDate(startOfWeek.getDate() + 7);
-        }
+      default:
+        done = this.getDone() >= quotaAmount;
         break;
-
-      // Add additional cases for other durations if needed
     }
 
     return done;
   }
 
-  getDone() {
-    return 3;
+  getStartOfWeek(date) {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is Sunday
+    return new Date(d.setDate(diff));
   }
 
+
+  // Helper function to get the start of the period
+  getStartOfPeriod(period, date) {
+    const d = new Date(date);
+    switch (period) {
+      case 'weekly':
+      case 'bi-weekly':
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+        d.setDate(diff);
+        return d;
+      case 'monthly':
+        return new Date(d.getFullYear(), d.getMonth(), 1);
+      case 'quarterly':
+        const quarter = Math.floor(d.getMonth() / 3);
+        return new Date(d.getFullYear(), quarter * 3, 1);
+      case 'semi-annually':
+        const half = Math.floor(d.getMonth() / 6);
+        return new Date(d.getFullYear(), half * 6, 1);
+      case 'yearly':
+        return new Date(d.getFullYear(), 0, 1);
+      default:
+        return d;
+    }
+  }
+
+  // Helper function to get the end of the period
+  getEndOfPeriod(period, start) {
+    const d = new Date(start);
+    switch (period) {
+      case 'weekly':
+        d.setDate(d.getDate() + 6);
+        break;
+      case 'bi-weekly':
+        d.setDate(d.getDate() + 13);
+        break;
+      case 'monthly':
+        d.setMonth(d.getMonth() + 1);
+        d.setDate(0); // Last day of the current month
+        break;
+      case 'quarterly':
+        d.setMonth(d.getMonth() + 3);
+        d.setDate(0); // Last day of the current quarter
+        break;
+      case 'semi-annually':
+        d.setMonth(d.getMonth() + 6);
+        d.setDate(0); // Last day of the current semester
+        break;
+      case 'yearly':
+        d.setFullYear(d.getFullYear() + 1);
+        d.setDate(0); // Last day of the year
+        break;
+    }
+    return d;
+  }
+
+  // Returns the number of days a habit has been marked complete within their quota duration
+  getDone() {
+    const today = new Date();
+    let count = 0;
+    const periodStart = this.getStartOfPeriod(this.quota.duration.toLowerCase(), today);
+    const periodEnd = this.getEndOfPeriod(this.quota.duration.toLowerCase(), periodStart);
+
+    // Filter history entries within the period and that are marked as done
+    count = this.history.filter(entry => {
+      const entryDate = new Date(entry.date);
+      return entryDate >= periodStart && entryDate <= periodEnd && entry.done;
+    }).length;
+
+    return count;
+  }
   getStreak() {
     // check if there any days missing in their entries from the day that this habit was started
   }
 
+  // Turn obj to Habit obj
+  static serialize(habits) {
+    if (Array.isArray(habits)) {
+      // If it's an array, handle each object in the list
+      return habits.map(h => new Habit(h.name, h.start, h.history, h.exclusions, h.quota, h.id));
+    }
+    else {
+      // If it's a single object, convert and return it
+      return new Habit(habits.name, habits.start, habits.history, habits.exclusions, habits.quota, habits.id);
+    }
+  }
 }
 
 class Module {
@@ -168,16 +269,15 @@ class Quota extends Module {
   constructor(habits) {
     super();
     this.className = "module-quota";
-    this.html = this.generateTableHtml(habits);
+    this.html = this.createTableHtml(habits);
     this.createModule(this.className, this.html);
   }
 
-  generateTableHtml(habits) {
-    let tableHtml = `<strong style="text-align: center; font-size: 20px;">Quota</strong><table>`;
-    habits.forEach(habitData => {
-      const habit = new Habit(habitData.name, habitData.start, habitData.history, habitData.exclusions, habitData.quota);
+  createTableHtml(habits) {
+    let tableHtml = `<strong style="text-align: center; font-size: 20px; margin-bottom: 10px;">Quota</strong><table>`;
+    habits.forEach(habit => {
       if (habit.quota.duration === "yearly") {
-        return;
+        // return;
       }
       tableHtml += this.createTableRow(habit);
     });
@@ -186,21 +286,45 @@ class Quota extends Module {
   }
 
   createTableRow(habit) {
-    const backgroundColor = habit.metQuota() ? "lightgreen" : "rgb(255, 100, 100)";
+    const happyOrSad = habit.metQuota() ? "happy" : "sad";
     const done = habit.getDone();
     const total = habit.quota.amount;
     // <tr title='${habit.name}' style='background: linear-gradient(to right, ${backgroundColor} 70%, transparent 70%);'>
-
     return `
-      <tr class='habit-row' title='${habit.name}'>
-        <td style='color: ${backgroundColor};'>${done}/${total}</td>
+      <tr class='habit-row ${happyOrSad}' id='quota-${habit.id}' title='${habit.name}'>
+        <td>${done}/${total}</td>
         <td>${habit.quota.duration}</td>
       </tr>
     `;
   }
 
-  update() {
+  // Returns id's of that have been completed
+  getDone() {
+    return document.querySelectorAll(".module-quota tr.happy");
+  }
 
+  // Here we are given the id of the habit that was altered.
+  // Now we will edit the text
+  update(id) {
+    let habit = app.HabitTracker.habits.find(h => h.id == id);
+    let selector = "quota-" + id;
+    let row = document.getElementById(selector);
+    let newRowHtml = this.createTableRow(habit).trim();
+
+    let tempContainer = document.createElement('tbody');
+    tempContainer.innerHTML = newRowHtml;
+
+    // The first child should now be a <tr> element
+    let newRow = tempContainer.firstElementChild;
+    console.log(row)
+    console.log(newRow)
+    console.log(newRowHtml)
+
+    // Insert the new row after the current row and remove the old row
+    row.parentNode.replaceChild(newRow, row);
+
+    // After we have updated this we now update other things
+    app.Reward.update();
   }
 }
 
@@ -238,6 +362,7 @@ class HabitTracker extends Module {
   constructor(habits) {
     super();
     this.className = "module-habits";
+    this.habits = habits;
     this.html = this.buildTable(habits);
     this.createModule(this.className, this.html);
   }
@@ -246,8 +371,8 @@ class HabitTracker extends Module {
     const [dayNames, currentDay, weekNumber] = this.getWeekData();
     let tableHtml = `<table><tr><th>Week ${weekNumber} / 52</th>${this.generateDayHeaders(dayNames, currentDay)}</tr>`;
     habits.forEach(habit => {
-      if (habit.quota.duration === "yearly") return;
-      tableHtml += this.generateHabitRow(habit, currentDay);
+      // if (habit.quota.duration === "yearly") return;
+      tableHtml += this.generateHabitRow(habit);
     });
     tableHtml += `</table><div class='habit-tracker-footer'><a onclick="HabitTracker.openDialog()">New</a><a onclick='app.HabitTracker.save()'>Save</a></div>`;
     return tableHtml;
@@ -266,20 +391,43 @@ class HabitTracker extends Module {
     return dayNames.map((day, i) => `<th class="${i === currentDay ? 'current-day' : ''}">${day}</th>`).join('');
   }
 
-  generateHabitRow(habit, currentDay) {
-    let rowHtml = `<tr><td>${habit.name}</td>${this.generateWeekDays(habit, currentDay)}</tr>`;
+  generateHabitRow(habit) {
+    let rowHtml = `<tr><td>${habit.name}</td>${this.generateWeekDays(habit)}</tr>`;
     return rowHtml;
   }
 
-  generateWeekDays(habit, currentDay) {
+  getStartOfWeek(date) {
+    const d = new Date(date);
+    const day = d.getDay(); // Sunday - 0, Monday - 1, ..., Saturday - 6
+    const diff = d.getDate() - day; // Subtract the day index to go back to Sunday
+    return new Date(d.setDate(diff));
+  }
+
+  generateWeekDays(habit) {
+    const today = new Date();
+    const startOfWeek = this.getStartOfWeek(today);
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(endOfWeek.getDate() + 6); // The end of the week is 6 days after the start
     return Array.from({ length: 7 }, (_, j) => {
-      let className = 'habit-day' + (j === currentDay ? ' habit-day-today' : '');
-      let historyIndex = habit.history.length - j - 1;
-      if (historyIndex >= 0 && habit.history[historyIndex]?.done) {
+      const weekDay = new Date(startOfWeek);
+      weekDay.setDate(weekDay.getDate() + j); // No need to subtract 1 anymore
+
+      let className = 'habit-day' + (weekDay.toDateString() === today.toDateString() ? ' habit-day-today' : '');
+
+      if (habit.history.some(entry => {
+        const entryDate = new Date(entry.date);
+        return entryDate.toDateString() === weekDay.toDateString() && entry.done;
+      })) {
         className += ' checked';
       }
-      return `<td class="${className}" onclick="HabitTracker.toggleCheck(this, ${j === currentDay})"></td>`;
+
+      return `<td class="${className}" onclick="HabitTracker.handleCheck(this, ${weekDay.toDateString() === today.toDateString()}, ${habit.id})"></td>`;
     }).join('');
+  }
+
+  // Will be saving entries from today
+  async save() {
+
   }
 
   static openDialog() {
@@ -327,11 +475,41 @@ class HabitTracker extends Module {
     // Additional functionality to add the habit to a table and update the quota 
   }
 
-  static toggleCheck(element, isToday) {
-    if (isToday) {
-      element.classList.toggle('checked');
-      app.Quota.update();
+  static handleCheck(element, isToday, id) {
+    if (!isToday) { return }
+    // Toggle the 'checked' class first
+    element.classList.toggle('checked');
+
+    // Check if the element is now checked or unchecked after toggling
+    let isChecked = element.classList.contains('checked');
+
+    // Find the habit with the given id
+    let habit = app.HabitTracker.habits.find(h => h.id === id);
+    if (!habit) {
+      console.error('Habit not found');
+      return;
     }
+
+    // Get today's date in the same format as your habit history dates
+    let today = new Date().toLocaleDateString('en-US');
+
+    // Find today's entry in the habit history
+    let todayEntry = habit.history.find(entry => entry.date === today);
+
+    if (todayEntry) {
+      // If today's entry exists, update its 'done' status
+      todayEntry.done = isChecked;
+    } else {
+      // If today's entry doesn't exist, create it and set its 'done' status
+      habit.history.push({
+        date: today,
+        note: 'Added by check', // You may want to customize the note
+        done: isChecked
+      });
+    }
+
+    // Assuming app.Quota.update() takes care of persisting the changes
+    app.Quota.update(id);
   }
 
 
@@ -349,7 +527,6 @@ class HabitTracker extends Module {
   }
 
   static async saveNewHabit(habit) {
-    console.log(habit)
     try {
       const response = await fetch(`http://${HOST}/newHabit`, {
         method: 'POST',
@@ -376,12 +553,26 @@ class HabitTracker extends Module {
 class day2day {
   constructor() {
     this.modules = []
+    this.config = {
+      HabitTracker: true, // grid of habits and their entries plus notes
+      Quota: true, // monitors if your habits are on track
+      Reward: true, // the goods you get after you do your habits!!!
+      Mood: true, // questions with range inputs
+      Tasks: true, // the shit 
+      Summary: true, // a summary of shit you should probably do
+      Stats: true, // some insights from your habits, mood, etc
+      Travel: true, // a travel checklist, and maybe map
+      Mantra: true, // to keep that ideal self present
+      Quotes: true, // random inspirational quotes
+      Word: true, // Word of the day
+      Baseline: true, // Keep yourself grounded
+    }
   }
   async start() {
     // Habit Tracker & Quota
     HabitTracker.getData().then(habits => {
       if (habits) {
-        console.log(habits)
+        habits = Habit.serialize(habits);
         let ht = new HabitTracker(habits);
         let q = new Quota(habits);
         ht.render();

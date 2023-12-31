@@ -1,20 +1,31 @@
 [
     {
         "name": "\ud83e\uddd8\u200d\u2642\ufe0fMeditate",
+        "id": 17039917431140,
         "start": "12/11/2023",
         "history": [
             {
-                "date": "12/25/2023",
+                "date": "11/25/2023",
                 "note": "The beginning!",
                 "done": true
             },
             {
-                "date": "12/26/2023",
+                "date": "12/23/2023",
+                "note": "yolo",
+                "done": true
+            },
+            {
+                "date": "12/24/2023",
                 "note": "Tired af",
                 "done": true
             },
             {
                 "date": "12/28/2023",
+                "note": "Tired af",
+                "done": true
+            },
+            {
+                "date": "12/30/2023",
                 "note": "Tired af",
                 "done": true
             }
@@ -28,19 +39,16 @@
         }
     },
     {
-        "name": "Travel to a Foreign Country",
-        "start": "1/1/2024",
-        "history": [],
-        "exclusions": [],
-        "quota": {
-            "duration": "yearly",
-            "amount": 2
-        }
-    },
-    {
         "name": "\ud83d\udcd6Read Book",
+        "id": 17039917431142,
         "start": "1/1/2024",
-        "history": [],
+        "history": [
+            {
+                "date": "11/31/2023",
+                "note": "The beginning!",
+                "done": true
+            }
+        ],
         "exclusions": [],
         "quota": {
             "duration": "monthly",
@@ -49,8 +57,25 @@
     },
     {
         "name": "\ud83c\udfcb\ufe0fGym",
+        "id": 17039917431144,
         "start": "1/1/2024",
-        "history": [],
+        "history": [
+            {
+                "date": "12/29/2023",
+                "note": "Tired af",
+                "done": true
+            },
+            {
+                "date": "12/28/2023",
+                "note": "Tired af",
+                "done": true
+            },
+            {
+                "date": "12/27/2023",
+                "note": "Tired af",
+                "done": true
+            }
+        ],
         "exclusions": [],
         "quota": {
             "duration": "weekly",
@@ -59,6 +84,7 @@
     },
     {
         "name": "\ud83d\udde3\ufe0fX Post",
+        "id": 17039917431145,
         "start": "1/1/2024",
         "history": [],
         "exclusions": [
@@ -73,6 +99,7 @@
     },
     {
         "name": "\ud83d\udeabZaza Free",
+        "id": 17039917431146,
         "start": "1/1/2024",
         "history": [],
         "exclusions": [],
@@ -83,6 +110,7 @@
     },
     {
         "name": "\ud83d\udcc8Biz Work",
+        "id": 17039917431147,
         "start": "1/1/2024",
         "history": [],
         "exclusions": [],
@@ -93,6 +121,7 @@
     },
     {
         "name": "\ud83d\ude34Slept 7hrs+",
+        "id": 17039917431148,
         "start": "1/1/2024",
         "history": [],
         "exclusions": [
@@ -105,6 +134,7 @@
     },
     {
         "name": "\ud83c\udf19LD Attempt",
+        "id": 17039917431149,
         "start": "1/1/2024",
         "history": [],
         "exclusions": [
@@ -117,11 +147,34 @@
     },
     {
         "name": "\ud83c\udf1fLD Success\ud83c\udf1f",
+        "id": 170399174311410,
         "start": "1/1/2024",
         "history": [],
         "exclusions": [],
         "quota": {
             "duration": "monthly",
+            "amount": 1
+        }
+    },
+    {
+        "name": "\ud83d\udcf7Post YT Video",
+        "id": 170399174311411,
+        "start": "2024-01-01",
+        "history": [],
+        "exclusions": [],
+        "quota": {
+            "duration": "monthly",
+            "amount": 1
+        }
+    },
+    {
+        "name": "\u2708 New Country",
+        "id": 1704002170437,
+        "start": "2024-01-01",
+        "history": [],
+        "exclusions": [],
+        "quota": {
+            "duration": "yearly",
             "amount": 1
         }
     }

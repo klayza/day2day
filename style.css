@@ -24,7 +24,10 @@ dialog::backdrop {
   background-color: rgba(0, 0, 0, .9);
 }
 
-input, textarea, select, button {
+input,
+textarea,
+select,
+button {
   background-color: rgb(49, 49, 49);
 }
 
@@ -52,6 +55,8 @@ input, textarea, select, button {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
+  width: 90%;
+  margin: auto;
 }
 
 .module {
@@ -92,7 +97,7 @@ input, textarea, select, button {
 
 .module-reward.locked .reward-image {
   filter: blur(13px);
-  margin: -10px -10px -10px -10px;
+  /* margin: -10px -10px -10px -10px; */
 }
 
 .lock-icon {
@@ -100,8 +105,9 @@ input, textarea, select, button {
 }
 
 .reward-image {
-  width: 400px;
+  width: 600px;
   height: auto;
+  border-radius: 20px;
 }
 
 .reward-header {
@@ -153,18 +159,24 @@ input, textarea, select, button {
 .habit-day {
   padding: 5px;
   text-align: center;
-  border: 10px solid black;
+  /* border: 10px solid black; */
+  width: 20px;
+  height: 20px;
 
 }
 
 .habit-day.habit-day-today:hover:not(.checked) {
-  background-color: aliceblue;
+  background-color: rgb(98, 156, 98);
   cursor: pointer;
+}
+
+.habit-day:not(.habit-day-today):hover:not(.checked) {
+  background-color: rgb(32, 32, 32);
 }
 
 .checked {
   background-color: lightgreen;
-  border-radius: 8px;
+  /* border-radius: 8px; */
 }
 
 .hidden {
@@ -201,7 +213,8 @@ td:first-child {
 }
 
 .habit-row {
-  height: 43px;
+  height: 45px;
+  border-bottom: 2px solid rgb(20, 20, 20);
 }
 
 .habit-row td {
@@ -227,7 +240,7 @@ td:first-child {
   border-radius: 20px;
   padding: 8px;
   text-align: center;
-
+  margin-top: 10px;
   /* padding: 10px 5px 0px 5px; */
 }
 
@@ -241,4 +254,51 @@ td:first-child {
   color: lightgreen;
   /* text-align: right; */
   /* display: none; */
+}
+
+.module-reward {
+  position: relative;
+  /* Add this */
+}
+
+.unlock-button {
+  border: 1px solid rgb(63, 60, 60);
+  border-radius: 30px;
+  padding: 5px 10px 9px 10px;
+  width: fit-content;
+  position: absolute;
+  /* Change to absolute */
+  top: 50%;
+  /* Center vertically */
+  left: 50%;
+  /* Center horizontally */
+  transform: translate(-50%, -50%);
+  /* Adjust for the button's dimensions */
+  font-size: 30px;
+  background-color: black;
+  z-index: 10;
+  /* Ensure it's above the image */
+  cursor: pointer;
+  color: lightgreen;
+}
+
+.happy td:first-child {
+  color: lightgreen;
+}
+
+.sad td:first-child {
+  color: rgb(255, 100, 100);
+}
+
+.module-quota table {
+  /* margin-top: 1px; */
+}
+
+.module-habits tr:not(:first-child) {
+  border-bottom: 2px solid rgb(20, 20, 20);
+}
+
+.module-habits tr:not(:first-child):hover,
+.module-quota tr:not(:first-child):hover {
+  background-color: rgb(20, 20, 20);
 }

@@ -2,6 +2,7 @@ import json
 import os
 import random
 from datetime import datetime
+import time
 from flask_cors import CORS
 from dotenv import load_dotenv
 from flask import Flask, send_file, jsonify, request
@@ -91,6 +92,9 @@ def getHabits():
 def newHabit():
     data = request.get_json()
     habit = data["habit"]
+    habit_id = genHabitID()
+    habit["id"] = habit_id
+
     habits = []
     try:
         with open("habits.json", "r") as f:
@@ -100,8 +104,12 @@ def newHabit():
     habits.append(habit)
     with open("habits.json", "w") as f:
         json.dump(habits, f, indent=4)
-    
+
     return jsonify({"message": "Habit added successfully"}), 200
+
+
+def genHabitID():
+    return int(time.time() * 1000)
 
 
 @app.route("/")
