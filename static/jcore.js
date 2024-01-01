@@ -1,5 +1,5 @@
-let HOST = "127.0.0.1:5621" // WINDOWS server (debug)
-// let HOST = "192.168.0.165:5621" // LINUX server (production)
+// let HOST = "127.0.0.1:5621" // WINDOWS server (debug)
+let HOST = "192.168.0.165:5621" // LINUX server (production)
 
 function updateHeader() {
   let bedTime = 23; // 11pm

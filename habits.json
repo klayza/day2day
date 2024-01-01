@@ -1,6 +1,6 @@
 [
     {
-        "name": "\ud83e\uddd8\u200d\u2642\ufe0fMeditate",
+        "name": "\ud83e\uddd8\u200d\u2642\ufe0f Meditate",
         "id": 17039917431140,
         "start": "12/11/2023",
         "history": [
@@ -39,7 +39,7 @@
         }
     },
     {
-        "name": "\ud83d\udcd6Read Book",
+        "name": "\ud83d\udcd6 Read Book",
         "id": 17039917431142,
         "start": "1/1/2024",
         "history": [
@@ -56,7 +56,7 @@
         }
     },
     {
-        "name": "\ud83c\udfcb\ufe0fGym",
+        "name": "\ud83c\udfcb\ufe0f Gym",
         "id": 17039917431144,
         "start": "1/1/2024",
         "history": [
@@ -83,7 +83,7 @@
         }
     },
     {
-        "name": "\ud83d\udde3\ufe0fX Post",
+        "name": "\ud83d\udde3\ufe0f X Post",
         "id": 17039917431145,
         "start": "1/1/2024",
         "history": [],
@@ -98,7 +98,7 @@
         }
     },
     {
-        "name": "\ud83d\udeabZaza Free",
+        "name": "\ud83d\udeab Zaza Free",
         "id": 17039917431146,
         "start": "1/1/2024",
         "history": [],
@@ -109,7 +109,7 @@
         }
     },
     {
-        "name": "\ud83d\udcc8Biz Work",
+        "name": "\ud83d\udcc8 Biz Work",
         "id": 17039917431147,
         "start": "1/1/2024",
         "history": [],
@@ -120,7 +120,7 @@
         }
     },
     {
-        "name": "\ud83d\ude34Slept 7hrs+",
+        "name": "\ud83d\ude34 Slept 7hrs+",
         "id": 17039917431148,
         "start": "1/1/2024",
         "history": [],
@@ -133,7 +133,7 @@
         }
     },
     {
-        "name": "\ud83c\udf19LD Attempt",
+        "name": "\ud83c\udf19 LD Attempt",
         "id": 17039917431149,
         "start": "1/1/2024",
         "history": [],
@@ -146,7 +146,7 @@
         }
     },
     {
-        "name": "\ud83c\udf1fLD Success\ud83c\udf1f",
+        "name": "\ud83c\udf1f LD Success\ud83c\udf1f",
         "id": 170399174311410,
         "start": "1/1/2024",
         "history": [],
@@ -157,7 +157,7 @@
         }
     },
     {
-        "name": "\ud83d\udcf7Post YT Video",
+        "name": "\ud83d\udcf7 Post YT Video",
         "id": 170399174311411,
         "start": "2024-01-01",
         "history": [],
@@ -175,6 +175,17 @@
         "exclusions": [],
         "quota": {
             "duration": "yearly",
+            "amount": 1
+        }
+    },
+    {
+        "name": "\ud83e\uddb7 Floss",
+        "id": 1704137847916,
+        "start": "2024-01-02",
+        "history": [],
+        "exclusions": [],
+        "quota": {
+            "duration": "daily",
             "amount": 1
         }
     }
