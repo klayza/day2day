@@ -1,5 +1,5 @@
-// let HOST = "127.0.0.1:5621" // WINDOWS server (debug)
-let HOST = "192.168.0.165:5621" // LINUX server (production)
+let HOST = "127.0.0.1:5621" // WINDOWS server (debug)
+// let HOST = "192.168.0.165:5621" // LINUX server (production)
 
 function updateHeader() {
   let bedTime = 23; // 11pm
@@ -36,12 +36,17 @@ function updateHeader() {
 class Reward {
   constructor(rewardImageUrl) {
     this.className = "module-reward"
-    this.goal = 1;
+    this.goal = this.getGoal();
     this.html = `
     ${this.getButton()}
     ${this.getHeader()}
     <img class='reward-image' src='${rewardImageUrl}?time=${new Date().getTime()}'>
   `;
+  }
+
+  getGoal() {
+    // Currently we will only look for daily items
+    return 5;
   }
 
   getButton() {
