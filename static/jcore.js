@@ -45,8 +45,9 @@ class Reward {
   }
 
   getGoal() {
-    // Currently we will only look for daily items
-    return 5;
+    // Filter the habits for those with a daily quota duration and count them
+    let dailyHabitsCount = app.HabitTracker.habits.filter(habit => habit.quota.duration === 'daily').length;
+    return dailyHabitsCount;
   }
 
   getButton() {
@@ -109,10 +110,21 @@ class Reward {
     moduleReward.insertAdjacentHTML('afterbegin', newHtml);
   }
 
+  toggle() {
+    let x = document.querySelector("." + this.className);
+
+    console.log("." + this.className)
+    if (x.style.display === "none") {
+      x.style.display = "block";
+    } else {
+      x.style.display = "none";
+    }
+  }
+
   render() {
     const modules = document.querySelector('.modules');
     const thisModule = document.createElement('div');
-    thisModule.className = this.className += " locked module";
+    thisModule.className = this.className + " locked module";
     thisModule.innerHTML = this.html;
     modules.appendChild(thisModule);
   }
@@ -226,9 +238,18 @@ class Habit {
     const periodStart = this.getStartOfPeriod(this.quota.duration.toLowerCase(), today);
     const periodEnd = this.getEndOfPeriod(this.quota.duration.toLowerCase(), periodStart);
 
-    // Filter history entries within the period and that are marked as done
+    // Helper function to compare dates
+    const isSameDay = (d1, d2) => {
+      return d1.getFullYear() === d2.getFullYear() &&
+        d1.getMonth() === d2.getMonth() &&
+        d1.getDate() === d2.getDate();
+    };
+
     count = this.history.filter(entry => {
       const entryDate = new Date(entry.date);
+      if (this.quota.duration === "daily") {
+        return isSameDay(entryDate, periodStart) && entry.done;
+      }
       return entryDate >= periodStart && entryDate <= periodEnd && entry.done;
     }).length;
 
@@ -293,6 +314,7 @@ class Quota extends Module {
   createTableRow(habit) {
     const happyOrSad = habit.metQuota() ? "happy" : "sad";
     const done = habit.getDone();
+
     const total = habit.quota.amount;
     // <tr title='${habit.name}' style='background: linear-gradient(to right, ${backgroundColor} 70%, transparent 70%);'>
     return `
@@ -321,9 +343,6 @@ class Quota extends Module {
 
     // The first child should now be a <tr> element
     let newRow = tempContainer.firstElementChild;
-    console.log(row)
-    console.log(newRow)
-    console.log(newRowHtml)
 
     // Insert the new row after the current row and remove the old row
     row.parentNode.replaceChild(newRow, row);
@@ -432,8 +451,44 @@ class HabitTracker extends Module {
 
   // Will be saving entries from today
   async save() {
+    let url = `http://${HOST}/saveHabitChecks`;
+    let data = {
+      habits: this.habits.map(habit => {
+        // Create a simplified version of the habit for saving
+        return {
+          id: habit.id,
+          name: habit.name,
+          start: habit.start,
+          history: habit.history,
+          exclusions: habit.exclusions,
+          quota: habit.quota
+        };
+      })
+    };
 
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        throw new Error('Error saving habits');
+      }
+
+      const result = await response.json();
+      console.log('Habits saved successfully:', result);
+
+      // Additional code can be placed here to handle the response, such as updating the UI
+
+    } catch (error) {
+      console.error("Couldn't save habits", error);
+    }
   }
+
 
   static openDialog() {
     let dialog = document.querySelector(".new-habit-dialog");
@@ -447,6 +502,13 @@ class HabitTracker extends Module {
 
     // Show the dialog
     dialog.showModal();
+  }
+
+  static closeDialog() {
+    let dialog = document.querySelector(".new-habit-dialog");
+
+    // Close the dialog
+    dialog.close();
   }
 
   static handleNewHabit() {
@@ -476,8 +538,13 @@ class HabitTracker extends Module {
     let habit = new Habit(name, start, [], exclusions, quota);
 
     HabitTracker.saveNewHabit(habit); //.then update the table and quota
+    HabitTracker.closeDialog();
+    // TODO: app.HabitTracker.update(); - will need to fix.
+  }
 
-    // Additional functionality to add the habit to a table and update the quota 
+  update() {
+    this.html = this.buildTable(app.HabitTracker.habits);
+    this.render();
   }
 
   static handleCheck(element, isToday, id) {
@@ -508,7 +575,6 @@ class HabitTracker extends Module {
       // If today's entry doesn't exist, create it and set its 'done' status
       habit.history.push({
         date: today,
-        note: 'Added by check', // You may want to customize the note
         done: isChecked
       });
     }

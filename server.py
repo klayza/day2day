@@ -108,6 +108,37 @@ def newHabit():
     return jsonify({"message": "Habit added successfully"}), 200
 
 
+@app.route("/saveHabitChecks", methods=["POST"])
+def saveHabitChecks():
+    data = request.get_json()
+    newHabits = data["habits"]
+
+    # Load existing habits
+    existingHabits = []
+    try:
+        with open("habits.json", "r") as file:
+            existingHabits = json.load(file)
+    except FileNotFoundError:
+        pass  # If the file doesn't exist, we start with an empty list
+
+    # Update existing habits with the new data
+    for newHabit in newHabits:
+        for i, existingHabit in enumerate(existingHabits):
+            if existingHabit["id"] == newHabit["id"]:
+                existingHabits[i] = newHabit
+                break
+        else:
+            # If the habit is not found in existingHabits, it's a new habit, so add it
+            existingHabits.append(newHabit)
+
+    # Save the updated habits back to the file
+    with open("habits.json", "w") as file:
+        json.dump(existingHabits, file, indent=4)
+
+    return jsonify({"message": "Habits updated successfully"}), 200
+    
+
+
 def genHabitID():
     return int(time.time() * 1000)
 
