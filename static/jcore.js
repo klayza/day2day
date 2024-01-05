@@ -394,6 +394,21 @@ class HabitTracker extends Module {
   buildTable(habits) {
     const [dayNames, currentDay, weekNumber] = this.getWeekData();
     let tableHtml = `<table><tr><th>Week ${weekNumber} / 52</th>${this.generateDayHeaders(dayNames, currentDay)}</tr>`;
+
+    // First sort habits by smallest duration first
+    habits = habits.sort((a, b) => HabitTracker.durationToNum(a.quota.duration) - HabitTracker.durationToNum(b.quota.duration));
+    /*
+      <option value="weekly">Weekly</option>
+      <option value="daily">Daily</option>
+      <option value="bi-weekly">Bi-weekly</option>
+      <option value="monthly">Monthly</option>
+      <option value="quarterly">Quarterly (4mo)</option>
+      <option value="semi-annually">Semi-Annually (6mo)</option>
+      <option value="yearly">Yearly (12mo)</option>
+
+    */
+
+    // Build rows
     habits.forEach(habit => {
       // if (habit.quota.duration === "yearly") return;
       tableHtml += this.generateHabitRow(habit);
@@ -540,6 +555,19 @@ class HabitTracker extends Module {
     HabitTracker.saveNewHabit(habit); //.then update the table and quota
     HabitTracker.closeDialog();
     // TODO: app.HabitTracker.update(); - will need to fix.
+  }
+
+  static durationToNum(duration) {
+    const order = {
+      'daily': 1,
+      'weekly': 2,
+      'bi-weekly': 3,
+      'monthly': 4,
+      'quarterly': 5,
+      'semi-annually': 6,
+      'yearly': 7
+    };
+    return order[duration] || 0;
   }
 
   update() {

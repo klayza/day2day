@@ -14,7 +14,7 @@ CORS(app)
 
 GOODS_DIR = os.getenv("goods")
 GOODGOODS_DIR = os.getenv("goodgoods")
-
+LOCATION = os.getenv("location")
 
 def get_random_image_path(directory):
     if not os.path.isdir(directory):
@@ -149,5 +149,6 @@ def home():
 
 
 if __name__ == "__main__":
-    app.run(port=5621, debug=True)  # WINDOWS
-    # app.run(host='0.0.0.0', port=5621, debug=True) # LINUX
+    if LOCATION == "windows": app.run(port=5621, debug=True)  
+    elif LOCATION == "linux": app.run(host='0.0.0.0', port=5621, debug=True) 
+    else: app.run(port=5621, debug=True)

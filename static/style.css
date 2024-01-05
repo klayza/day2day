@@ -194,9 +194,11 @@ td {
 }
 
 td:first-child {
-  width: 1px;
+  width: 1px; /* Fixed width is necessary, but 1px might be too small */
   font-size: 25px;
-  text-wrap: nowrap;
+  white-space: nowrap; /* Prevents text from wrapping */
+  overflow: hidden; /* Hides text that overflows the container */
+  text-overflow: ellipsis; /* Adds an ellipsis to overflowing text */
 }
 
 .bg-image {
@@ -311,3 +313,58 @@ td:first-child {
   height: 50px;
   cursor: pointer;
 }
+
+
+/* Existing styles... */
+
+@media (max-width: 600px) {
+  body {
+    /* margin: 0px; */
+  }
+
+  .header h1 {
+    font-size: 40px; /* Smaller font size for mobile */
+  }
+
+  .percent-completed-items {
+    flex-direction: column; /* Stack items vertically on small screens */
+    gap: 10px;
+  }
+
+  .modules {
+    width: 100%; /* Full width on small screens */
+    /* padding: 0 10px; Add some padding */
+  }
+
+  .module {
+    flex: 0 0 100%; /* Make modules full width on small screens */
+  }
+
+  .module-habits, .module-quota, .module-tasks {
+    min-width: 0; /* Remove min-width on small screens */
+  }
+
+  dialog * {
+    font-size: 16px; /* Smaller font size in dialog for mobile */
+  }
+
+  .reward-image {
+    width: 100%; /* Full width images on small screens */
+    height: auto;
+  }
+
+  .unlock-button {
+    font-size: 20px; /* Smaller button font size */
+    padding: 5px; /* Smaller padding */
+  }
+
+  table {
+    font-size: 16px; /* Smaller table font size */
+  }
+
+  .habit-tracker-footer a {
+    font-size: 16px; /* Smaller font size in footer links */
+  }
+}
+
+/* You can add more media queries for other screen sizes if needed */
