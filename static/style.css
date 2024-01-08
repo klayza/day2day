@@ -74,10 +74,11 @@ button {
 }
 
 .module-quota {
-  flex: 0 0 12.5%;
+  flex: 0 0 0;
   /* 1/8 width */
 
   text-align: center;
+  white-space: nowrap;
 }
 
 .module-tasks {

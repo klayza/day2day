@@ -168,6 +168,14 @@ class Habit {
     return done;
   }
 
+  // Returns days remaining before quota is met
+  getTimeLeft() {
+    const today = new Date();
+    const periodEnd = this.getEndOfPeriod(this.quota.duration.toLowerCase(), this.getStartOfPeriod(this.quota.duration.toLowerCase(), today));
+    const timeDiff = periodEnd - today;
+    return Math.ceil(timeDiff / (1000 * 3600 * 24)); // Convert milliseconds to days
+  }
+
   getStartOfWeek(date) {
     const d = new Date(date);
     const day = d.getDay();
@@ -302,9 +310,6 @@ class Quota extends Module {
   createTableHtml(habits) {
     let tableHtml = `<strong style="text-align: center; font-size: 20px; margin-bottom: 10px;">Quota</strong><table>`;
     habits.forEach(habit => {
-      if (habit.quota.duration === "yearly") {
-        // return;
-      }
       tableHtml += this.createTableRow(habit);
     });
     tableHtml += '</table>';
@@ -321,7 +326,8 @@ class Quota extends Module {
       <tr class='habit-row ${happyOrSad}' id='quota-${habit.id}' title='${habit.name}'>
         <td>${done}/${total}</td>
         <td>${habit.quota.duration}</td>
-      </tr>
+        <td>${(timeLeft => timeLeft === 0 ? 'today' : `${timeLeft} days left`)(habit.getTimeLeft())}</td>
+        </tr>
     `;
   }
 
@@ -391,6 +397,10 @@ class HabitTracker extends Module {
     this.createModule(this.className, this.html);
   }
 
+  getHabit(id) {
+    return this.habits.find(habit => habit.id === id);
+  }
+
   buildTable(habits) {
     const [dayNames, currentDay, weekNumber] = this.getWeekData();
     let tableHtml = `<table><tr><th>Week ${weekNumber} / 52</th>${this.generateDayHeaders(dayNames, currentDay)}</tr>`;
@@ -431,14 +441,17 @@ class HabitTracker extends Module {
   }
 
   generateHabitRow(habit) {
-    let rowHtml = `<tr><td>${habit.name}</td>${this.generateWeekDays(habit)}</tr>`;
+    let rowHtml = `<tr>
+        <td onclick='app.HabitTracker.openPreview(${habit.id})'>${habit.name}</td>
+        ${this.generateWeekDays(habit)}
+      </tr>`;
     return rowHtml;
   }
 
   getStartOfWeek(date) {
-    const d = new Date(date);
-    const day = d.getDay(); // Sunday - 0, Monday - 1, ..., Saturday - 6
-    const diff = d.getDate() - day; // Subtract the day index to go back to Sunday
+    const d = new Date(date)
+    const day = d.getDay();
+    const diff = d.getDate() - day;
     return new Date(d.setDate(diff));
   }
 
@@ -462,6 +475,19 @@ class HabitTracker extends Module {
 
       return `<td class="${className}" onclick="HabitTracker.handleCheck(this, ${weekDay.toDateString() === today.toDateString()}, ${habit.id})"></td>`;
     }).join('');
+  }
+
+  openPreview(id) {
+    let habit = this.getHabit(id);
+    let dialog = document.createElement('dialog');
+    dialog.classList.add('preview-dialog');
+    dialog.innerHTML = `
+    <p>Start: ${habit.start}</p>
+    <p>End of Quota: ${habit.getStartOfWeek(habit.start)}</p>
+    `;
+
+    document.body.appendChild(dialog);
+    dialog.showModal();
   }
 
   // Will be saving entries from today
@@ -648,6 +674,14 @@ class HabitTracker extends Module {
 
 }
 
+class X {
+  constructor(concepts) {
+    this.concepts = concepts
+  }
+  getConcepts() {
+
+  }
+}
 
 class day2day {
   constructor() {
@@ -657,6 +691,7 @@ class day2day {
       Quota: true, // monitors if your habits are on track
       Reward: true, // the goods you get after you do your habits!!!
       Mood: true, // questions with range inputs
+      X: true,
       Tasks: true, // the shit 
       Summary: true, // a summary of shit you should probably do
       History: true, // a wider view of your entries
@@ -698,6 +733,8 @@ class day2day {
         }
       });
 
+    }).then(() => {
+      // X.
     });
 
 
