@@ -1,5 +1,20 @@
-let HOST = "127.0.0.1:5621" // WINDOWS server (debug)
-// let HOST = "192.168.0.165:5621" // LINUX server (production)
+let HOST;
+
+if (/Android|Linux/.test(window.navigator.platform)) {
+    HOST = "192.168.0.165:5621"; // LINUX server (production)
+} 
+else if (/Win32|Win64|Windows|WinCE/.test(window.navigator.platform)) {
+    try {
+        // Attempt to connect to Windows server
+        HOST = "127.0.0.1:5621"; // WINDOWS server (debug)
+    } catch (error) {
+        // If Windows connection fails, default to Linux host
+        HOST = "192.168.0.165:5621"; // LINUX server (production)
+    }
+} 
+else {
+    HOST = "192.168.0.165:5621"; // LINUX server (production), default for unsupported platforms
+}
 
 function updateHeader() {
   let bedTime = 23; // 11pm
