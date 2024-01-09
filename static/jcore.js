@@ -701,7 +701,7 @@ class X {
 class day2day {
   constructor() {
     this.modules = []
-    this.config = {
+    this.loadout = {
       HabitTracker: true, // grid of habits and their entries plus notes
       Quota: true, // monitors if your habits are on track
       Reward: true, // the goods you get after you do your habits!!!
@@ -719,6 +719,16 @@ class day2day {
       Highlights: true, // Upload a pic that captures the highlight of a month
     }
   }
+
+  switchHost() {
+    if (HOST == "127.0.0.1:5621") {
+      HOST = "192.168.0.1:5621";
+    }
+    else {
+      HOST = "127.0.0.1:5621";
+    }
+  }
+
   async start() {
     // Habit Tracker & Quota
     HabitTracker.getData().then(habits => {

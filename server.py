@@ -16,6 +16,37 @@ GOODS_DIR = os.getenv("goods")
 GOODGOODS_DIR = os.getenv("goodgoods")
 LOCATION = os.getenv("location")
 
+class DB:
+    def __init__(self, filename):
+        self.filename = filename
+        self.data = self.load_data()
+
+    def load_data(self):
+        if not os.path.exists(self.filename):
+            with open(self.filename, "w") as file:
+                json.dump([], file)
+            return []
+
+        with open(self.filename, "r") as file:
+            return json.load(file)
+
+    def save_data(self):
+        with open(self.filename, "w") as file:
+            json.dump(self.data, file)
+
+    def get_data(self):
+        return self.data
+
+    def update_data(self, new_data):
+        self.data = new_data
+        self.save_data()
+
+# Example usage
+# db = DB("reminders.json")
+# reminders = db.get_data()
+# db.update_data(updated_reminders)
+
+
 def get_random_image_path(directory):
     if not os.path.isdir(directory):
         return None
@@ -136,7 +167,20 @@ def saveHabitChecks():
         json.dump(existingHabits, file, indent=4)
 
     return jsonify({"message": "Habits updated successfully"}), 200
+
+@app.route("/reminders/get")
+def getReminders():
+    db = DB("reminders.json")
+    reminders = db.get_data()
+    return jsonify(reminders), 200
+        
     
+@app.route("/reminders/new")
+def newReminder():
+    db = DB("reminders.json")
+    reminders = db.get_data()
+    return jsonify(reminders), 200
+        
     
 # @app.route("/x/random", methods=["POST"])
 
