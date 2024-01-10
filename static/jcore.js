@@ -705,15 +705,16 @@ class Cookie {
 
 function genHost() {
   let cookie = Cookie.get("host");
-
+  let isAndroid = /Android|Linux/.test(window.navigator.platform);
   // If there is already a host set
-  if (cookie) {
+  if (cookie && !isAndroid) {
     HOST = cookie;
     return HOST;
   }
 
-  if (/Android|Linux/.test(window.navigator.platform)) {
+  if (isAndroid) {
     HOST = "192.168.0.165:5621"; // LINUX server (production)
+    return HOST;
   }
   else if (/Win32|Win64|Windows|WinCE/.test(window.navigator.platform)) {
     try {
