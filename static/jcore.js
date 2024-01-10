@@ -710,7 +710,7 @@ function setHost() {
   if (isAndroid) {
     HOST = "192.168.0.165:5621";
   }
-  else if (isWindows && Cookie.get("debug")) {
+  else if (isWindows && Cookie.get("debug") == "true") {
     HOST = "127.0.0.1:5621";  
   }
   else {
