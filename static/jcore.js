@@ -707,7 +707,7 @@ function genHost() {
   let cookie = Cookie.get("host");
   let isAndroid = /Android|Linux/.test(window.navigator.platform);
   // If there is already a host set
-  if (cookie && !isAndroid) {
+  if (cookie && isAndroid) {
     HOST = cookie;
     return HOST;
   }
