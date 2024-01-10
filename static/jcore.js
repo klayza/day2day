@@ -666,7 +666,7 @@ class HabitTracker extends Module {
 
       const result = await response.json();
       location.reload();
-    } 
+    }
     catch (error) {
       console.error("Couldn't save habit", error);
     }
@@ -703,33 +703,21 @@ class Cookie {
   }
 }
 
-function genHost() {
-  let cookie = Cookie.get("host");
+function setHost() {
   let isAndroid = /Android|Linux/.test(window.navigator.platform);
-  // If there is already a host set
-  if (cookie && isAndroid) {
-    HOST = cookie;
-    return HOST;
-  }
+  let isWindows = /Win32|Win64|Windows|WinCE/.test(window.navigator.platform);
 
   if (isAndroid) {
-    HOST = "192.168.0.165:5621"; // LINUX server (production)
-    return HOST;
+    HOST = "192.168.0.165:5621";
   }
-  else if (/Win32|Win64|Windows|WinCE/.test(window.navigator.platform)) {
-    try {
-      // Attempt to connect to Windows server
-      HOST = "127.0.0.1:5621"; // WINDOWS server (debug)
-    } catch (error) {
-      // If Windows connection fails, default to Linux host
-      HOST = "192.168.0.165:5621"; // LINUX server (production)
-    }
+  else if (isWindows) {
+    HOST = "127.0.0.1:5621";  
   }
   else {
-    HOST = "192.168.0.165:5621"; // LINUX server (production), default for unsupported platforms
+    HOST = "192.168.0.165:5621";
   }
 
-  Cookie.set("host", HOST);
+  // Cookie.set("host", HOST);
   return HOST;
 }
 
@@ -755,6 +743,7 @@ class day2day {
       Baseline: true, // Keep yourself grounded
       Highlights: true, // Upload a pic that captures the highlight of a month
     }
+    setHost();
   }
 
   switchHost() {
@@ -810,7 +799,7 @@ class day2day {
   }
 }
 
-HOST = genHost();
+
 
 // Init the app
 let app = new day2day();
