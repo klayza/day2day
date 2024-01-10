@@ -1,5 +1,4 @@
-let HOST = day2day.genHost();
-
+let HOST;
 function updateHeader() {
   let bedTime = 23; // 11pm
   let dayStart = 5; // 5am
@@ -521,6 +520,7 @@ class HabitTracker extends Module {
 
       const result = await response.json();
       console.log('Habits saved successfully:', result);
+      location.reload();
 
       // Additional code can be placed here to handle the response, such as updating the UI
 
@@ -665,8 +665,9 @@ class HabitTracker extends Module {
       }
 
       const result = await response.json();
-      return result;
-    } catch (error) {
+      location.reload();
+    } 
+    catch (error) {
       console.error("Couldn't save habit", error);
     }
   }
@@ -681,6 +682,57 @@ class X {
 
   }
 }
+
+class Cookie {
+  static get(name) {
+    let cookieArr = document.cookie.split('; ');
+    for (let i = 0; i < cookieArr.length; i++) {
+      let cookiePair = cookieArr[i].split('=');
+      if (name === cookiePair[0]) {
+        return decodeURIComponent(cookiePair[1]);
+      }
+    }
+    return null;
+  }
+
+  static set(name, value, days = 7) {
+    const d = new Date();
+    d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+    let expires = "expires=" + d.toUTCString();
+    document.cookie = name + "=" + encodeURIComponent(value) + ";" + expires + ";path=/";
+  }
+}
+
+function genHost() {
+  let cookie = Cookie.get("host");
+
+  // If there is already a host set
+  if (cookie) {
+    HOST = cookie;
+    return HOST;
+  }
+
+  if (/Android|Linux/.test(window.navigator.platform)) {
+    HOST = "192.168.0.165:5621"; // LINUX server (production)
+  }
+  else if (/Win32|Win64|Windows|WinCE/.test(window.navigator.platform)) {
+    try {
+      // Attempt to connect to Windows server
+      HOST = "127.0.0.1:5621"; // WINDOWS server (debug)
+    } catch (error) {
+      // If Windows connection fails, default to Linux host
+      HOST = "192.168.0.165:5621"; // LINUX server (production)
+    }
+  }
+  else {
+    HOST = "192.168.0.165:5621"; // LINUX server (production), default for unsupported platforms
+  }
+
+  Cookie.set("host", HOST);
+  return HOST;
+}
+
+
 
 class day2day {
   constructor() {
@@ -711,26 +763,10 @@ class day2day {
     else {
       HOST = "127.0.0.1:5621";
     }
+    Cookie.set("host", HOST);
+    console.log("Using " + HOST);
   }
 
-  static genHost() {
-    if (/Android|Linux/.test(window.navigator.platform)) {
-      HOST = "192.168.0.165:5621"; // LINUX server (production)
-  } 
-  else if (/Win32|Win64|Windows|WinCE/.test(window.navigator.platform)) {
-      try {
-          // Attempt to connect to Windows server
-          HOST = "127.0.0.1:5621"; // WINDOWS server (debug)
-      } catch (error) {
-          // If Windows connection fails, default to Linux host
-          HOST = "192.168.0.165:5621"; // LINUX server (production)
-      }
-  } 
-  else {
-      HOST = "192.168.0.165:5621"; // LINUX server (production), default for unsupported platforms
-  }
-    return HOST;
-  }
 
   async start() {
     // Habit Tracker & Quota
@@ -773,12 +809,13 @@ class day2day {
   }
 }
 
+HOST = genHost();
+
 // Init the app
 let app = new day2day();
 app.start().then(() => {
   app.render();
 });
-
 
 
 

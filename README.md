@@ -13,28 +13,35 @@ This program aims to keep you persistent, provide insights, and etch a clear pat
 
 ## Features
 
-**HabitTracker**
+### HabitTracker
 Your habits laid out in a grid for each. Set an amount for how often you want to do it. Daily, Weekly, Bi-Weekly, Monthly, Quarterly, Semi-annually, Yearly. 
 
-**Quota**
+<p align="center"><img width="280" src="./assets/habittracker.png"/></p>
+
+### Quota
 How many times you need to do a habit to meet it's quota. For ex. 3/10, weekly. 0/2, daily. Will tell you how much time you have left to get it done.
 
-**Reward**
+<p align="center"><img height="300" src="./assets/quota.png"/></p>
+
+### Reward
 Something that ensures you keep the grind up. Define a goal like how many habits you want to do in a day for the reward image to be unblurred. Don't think too hard about it...
 
-**Mood**
+<p align="center"><img height="300" src="./assets/reward.png"/></p>
+
+
+### Mood 
 A series of questions to track and assess multiple moods for the day. Ex. How happy are you from a 1 to 10? How sad are you? Tired? Tired in a good way?
 
-**Tasks**
+### Tasks 
 Boring ass tasks we like forgetting about. They will be front and center so there is absolutely no possible way we will try and hide them.
 
-**Plan**
+### Plan 
 The game plan for a day, week, month, etc.  Provided tasks, some general goals, and an AI will summarize a general plan for you. May create a schedule module in the future 
 
-**History**
+### History 
 A long term view of your habit entries. 
 
-**Stats**
+### Stats 
 Consider this: One person is OBSESSED with logging. He logs everything daily, as follows: Habits and their associated notes, tasks completed, mood tracking, event tracking, and reflections. With all of this data, we can roughly predict what makes him happy, sad, tired and so on. With the help of AI we can analyze notes, reflections, task completion, and more. We can build a model of the person as accurate as the effort put into this program, possibly even more so. And now that we have a representation of the person we can accurately suggest habits to start tracking, tasks to take on, adjust baseline questions to more efficiently shape the person.
 
 With all this said, I believe a system could be developed that could transform a person from shit to super. The last question would be: Are they willing to?

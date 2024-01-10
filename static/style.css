@@ -97,7 +97,7 @@ button {
 }
 
 .module-reward.locked .reward-image {
-  filter: blur(13px);
+  filter: blur(27px);
   /* margin: -10px -10px -10px -10px; */
 }
 
