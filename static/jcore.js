@@ -710,7 +710,7 @@ function setHost() {
   if (isAndroid) {
     HOST = "192.168.0.165:5621";
   }
-  else if (isWindows) {
+  else if (isWindows && Cookie.get("debug")) {
     HOST = "127.0.0.1:5621";  
   }
   else {
@@ -746,15 +746,16 @@ class day2day {
     setHost();
   }
 
-  switchHost() {
-    if (HOST == "127.0.0.1:5621") {
-      HOST = "192.168.0.1:5621";
-    }
-    else {
-      HOST = "127.0.0.1:5621";
-    }
-    Cookie.set("host", HOST);
-    console.log("Using " + HOST);
+  toggleDebug() {
+    if (Cookie.get("debug")) {Cookie.set("debug", true);}
+    else {Cookie.set("debug", false);}
+    // if (HOST == "127.0.0.1:5621") {
+    //   HOST = "192.168.0.1:5621";
+    // }
+    // else {
+    //   HOST = "127.0.0.1:5621";
+    // }
+    // Cookie.set("host", HOST);
   }
 
 
