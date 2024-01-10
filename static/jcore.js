@@ -747,7 +747,7 @@ class day2day {
   }
 
   toggleDebug() {
-    if (Cookie.get("debug")) {Cookie.set("debug", true);}
+    if (Cookie.get("debug") == "false") {Cookie.set("debug", true);}
     else {Cookie.set("debug", false);}
     // if (HOST == "127.0.0.1:5621") {
     //   HOST = "192.168.0.1:5621";
