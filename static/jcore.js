@@ -29,104 +29,15 @@ function updateHeader() {
     document.querySelector(".header h1").textContent = longDate;
   }
 }
-//         Reward.getTodaysReward().then(rewardImageUrl => {
 
-class Reward {
-  constructor(rewardImageUrl) {
-    this.className = "module-reward"
-    this.goal = this.getGoal();
-    this.html = `
-    ${this.getButton()}
-    ${this.getHeader()}
-    <img class='reward-image' src='${rewardImageUrl}?time=${new Date().getTime()}'>
-  `;
-  }
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 
-  getGoal() {
-    // Filter the habits for those with a daily quota duration and count them
-    let dailyHabitsCount = app.HabitTracker.habits.filter(habit => habit.quota.duration === 'daily').length;
-    return dailyHabitsCount;
-  }
+//  Sub-classes 
 
-  getButton() {
-    return `<div class='unlock-button ${!this.canUnlock() ? "hidden" : ""}' onclick='app.Reward.unlock()'>Unlock</div>`;
-  }
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 
-  getHeader() {
-    return `<div class='reward-header'><p class='reward-message'>Locked</p> 
-    <span class='reward-progress'>${this.getProgressBar()}</span></div>`;
-  }
-
-  getProgressBar() {
-    // let totalHabits = app.HabitTracker.habits.length;
-    let totalHabits = this.goal;
-    let totalDone = app.Quota.getDone().length;
-    let template = "<div class='reward-progress-{iORc}'></div>";
-    let result = "";
-    for (let i = 0; i < totalHabits; i++) {
-      result += template.replace("{iORc}", i < totalDone ? "complete" : "incomplete");
-    }
-    return result;
-  }
-
-  static async getTodaysReward() {
-    let url = `http://${HOST}/reward`;
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('No image available');
-      }
-      return response.url;
-    } catch (error) {
-      console.error('Error fetching the reward image:', error);
-      // return 'path/to/default/image.jpg';
-    }
-  }
-
-  // Check if the reward can be unclocked
-  canUnlock() {
-    return app.Quota.getDone().length >= this.goal;
-  }
-
-  unlock() {
-    document.querySelector('.unlock-button').classList.add('hidden');
-    document.querySelector('.reward-message').textContent = 'Unlocked';
-    document.querySelector('.module-reward').classList.remove('locked');
-  }
-
-  update() {
-    let newHtml = `${this.getButton()}${this.getHeader()}`;
-    let oldElements = document.querySelectorAll(".reward-header, .unlock-button");
-
-    // Remove the old elements
-    oldElements.forEach(element => {
-      element.parentNode.removeChild(element);
-    });
-
-    // Prepend the newHtml to the .module-reward container
-    let moduleReward = document.querySelector(".module-reward");
-    moduleReward.insertAdjacentHTML('afterbegin', newHtml);
-  }
-
-  toggle() {
-    let x = document.querySelector("." + this.className);
-
-    console.log("." + this.className)
-    if (x.style.display === "none") {
-      x.style.display = "block";
-    } else {
-      x.style.display = "none";
-    }
-  }
-
-  render() {
-    const modules = document.querySelector('.modules');
-    const thisModule = document.createElement('div');
-    thisModule.className = this.className + " locked module";
-    thisModule.innerHTML = this.html;
-    modules.appendChild(thisModule);
-  }
-}
 
 class Habit {
   constructor(name, start, history, exclusions, quota, id = 0) {
@@ -278,6 +189,18 @@ class Habit {
   }
 }
 
+
+
+
+
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+
+//  Modules 
+
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+
 class Module {
   constructor() {
     this.html = '';
@@ -285,24 +208,179 @@ class Module {
 
   render() {
     const modules = document.querySelector('.modules');
+    this.createModule();
     modules.appendChild(this.html);
   }
 
-  createModule(className, content) {
+  createModule() {
     const moduleElement = document.createElement('div');
-    moduleElement.className = `${className} module`;
-    moduleElement.innerHTML = content;
+    moduleElement.className = `${this.className} module`;
+    moduleElement.innerHTML = this.html;
     this.html = moduleElement;
-    console.log(this.html)
+  }
+
+  async getData() {
+    let url = `http://${HOST}/${this.endpoint}`;
+    try {
+      const response = await fetch(url);
+      console.log(response)
+      if (!response.ok) {
+        throw new Error("Error: " + response.status);
+      }
+      return response.json();
+    }
+    catch (error) {
+      console.log(url + ' | Data retrieval failed', error)
+    }
+  }
+
+}
+
+
+/*
+
+///
+////// Schema
+///
+
+  class Object {
+    constructor() {
+      this.className = "module-object"
+      this.endpoint = "object" <--- The initial server function to call. After running use data with this.data. Can also be undefined.    
+      this.fetchData = true <--- If this object needs to fetch data externally.
+    }
+
+    build() {
+      this.html = `...`
+    }
+
+    let app = new day2day();
+    await app then app.render();
+  }
+
+*/
+
+
+
+
+class Reward extends Module {
+  constructor() {
+    super();
+    this.className = "module-reward"
+    this.endpoint = "reward"
+    this.fetchData = false
+  }
+
+  build() {
+    this.rewardImageUrl = `http://${HOST}/${this.endpoint}`;
+    this.html = `
+    ${this.getButton()}
+    ${this.getHeader()}
+    <img class='reward-image' src='${this.rewardImageUrl}?time=${new Date().getTime()}'>
+  `;
+
+    this.goal = this.getGoal();
+  }
+
+  getGoal() {
+    // Filter the habits for those with a daily quota duration and count them
+    let dailyHabitsCount = app.modules.HabitTracker.data.filter(habit => habit.quota.duration === 'daily').length;
+    return dailyHabitsCount;
+  }
+
+  getButton() {
+    return `<div class='unlock-button ${!this.canUnlock() ? "hidden" : ""}' onclick='app.Reward.unlock()'>Unlock</div>`;
+  }
+
+  getHeader() {
+    return `<div class='reward-header'><p class='reward-message'>Locked</p> 
+    <span class='reward-progress'>${this.getProgressBar()}</span></div>`;
+  }
+
+  getProgressBar() {
+    // let totalHabits = app.HabitTracker.habits.length;
+    let totalHabits = this.goal;
+    let totalDone = app.modules.Quota.getDone().length;
+    let template = "<div class='reward-progress-{iORc}'></div>";
+    let result = "";
+    for (let i = 0; i < totalHabits; i++) {
+      result += template.replace("{iORc}", i < totalDone ? "complete" : "incomplete");
+    }
+    return result;
+  }
+
+  static async getTodaysReward() {
+    let url = `http://${HOST}/reward`;
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('No image available');
+      }
+      return response.url;
+    } catch (error) {
+      console.error('Error fetching the reward image:', error);
+      // return 'path/to/default/image.jpg';
+    }
+  }
+
+  // Check if the reward can be unclocked
+  canUnlock() {
+    return app.modules.Quota.getDone().length >= this.goal;
+  }
+
+  unlock() {
+    document.querySelector('.unlock-button').classList.add('hidden');
+    document.querySelector('.reward-message').textContent = 'Unlocked';
+    document.querySelector('.module-reward').classList.remove('locked');
+  }
+
+  update() {
+    let newHtml = `${this.getButton()}${this.getHeader()}`;
+    let oldElements = document.querySelectorAll(".reward-header, .unlock-button");
+
+    // Remove the old elements
+    oldElements.forEach(element => {
+      element.parentNode.removeChild(element);
+    });
+
+    // Prepend the newHtml to the .module-reward container
+    let moduleReward = document.querySelector(".module-reward");
+    moduleReward.insertAdjacentHTML('afterbegin', newHtml);
+  }
+
+  toggle() {
+    let x = document.querySelector("." + this.className);
+
+    console.log("." + this.className)
+    if (x.style.display === "none") {
+      x.style.display = "block";
+    } else {
+      x.style.display = "none";
+    }
+  }
+
+  render() {
+    const modules = document.querySelector('.modules');
+    const thisModule = document.createElement('div');
+    thisModule.className = this.className + " locked module";
+    thisModule.innerHTML = this.html;
+    modules.appendChild(thisModule);
   }
 }
 
+
 class Quota extends Module {
-  constructor(habits) {
+  constructor() {
     super();
     this.className = "module-quota";
+    this.endpoint = undefined;
+    this.fetchData = false
+  }
+
+  build() {
+    let habits = app.modules.HabitTracker.data;
+    console.log(habits)
     this.html = this.createTableHtml(habits);
-    this.createModule(this.className, this.html);
   }
 
   createTableHtml(habits) {
@@ -387,16 +465,19 @@ function getQuotaAmount(duration) {
 }
 
 class HabitTracker extends Module {
-  constructor(habits) {
+  constructor() {
     super();
     this.className = "module-habits";
-    this.habits = habits;
-    this.html = this.buildTable(habits);
-    this.createModule(this.className, this.html);
+    this.endpoint = "getHabits";
+    this.fetchData = true;
+  }
+
+  build() {
+    this.html = this.buildTable(this.data);
   }
 
   getHabit(id) {
-    return this.habits.find(habit => habit.id === id);
+    return this.data.find(habit => habit.id === id);
   }
 
   buildTable(habits) {
@@ -609,7 +690,7 @@ class HabitTracker extends Module {
     let isChecked = element.classList.contains('checked');
 
     // Find the habit with the given id
-    let habit = app.HabitTracker.habits.find(h => h.id === id);
+    let habit = app.modules.HabitTracker.habits.find(h => h.id === id);
     if (!habit) {
       console.error('Habit not found');
       return;
@@ -637,18 +718,18 @@ class HabitTracker extends Module {
   }
 
 
-  static async getData() {
-    let url = `http://${HOST}/getHabits`;
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('Not ok response');
-      }
-      return response.json();
-    } catch (error) {
-      console.log("Couldn't get habit data", error)
-    }
-  }
+  // static async getData() {
+  //   let url = `http://${HOST}/getHabits`;
+  //   try {
+  //     const response = await fetch(url);
+  //     if (!response.ok) {
+  //       throw new Error('Not ok response');
+  //     }
+  //     return response.json();
+  //   } catch (error) {
+  //     console.log("Couldn't get habit data", error)
+  //   }
+  // }
 
   static async saveNewHabit(habit) {
     try {
@@ -674,13 +755,139 @@ class HabitTracker extends Module {
 
 }
 
-class X {
+class X extends Module {
   constructor(concepts) {
     this.concepts = concepts
   }
   getConcepts() {
 
   }
+}
+
+class MoodTracker extends Module {
+  constructor() {
+    super();
+    this.className = "module-mood";
+    this.endpoint = "mood";
+    this.fetchData = true;
+    this.moods = []; // Array to store mood objects
+    this.defaultMoodTypes = ['Happiness', 'Sadness', 'Tiredness', 'Anger', 'Stress', 'Calmness', 'Motivation', 'Anxiety'];
+
+  }
+
+  build() {
+    this.html = `
+      <div class="mood-tracker">
+        <div class='module-title'>Vibe Check</div>
+        ${this.buildMoodInputs()}
+        <button onclick="app.modules.MoodTracker.saveMoods()">Save Moods</button>
+      </div>
+    `;
+  }
+
+  buildMoodInputs() {
+    let inputsHtml = this.defaultMoodTypes.map(mood => this.createMoodInput(mood)).join('');
+    inputsHtml += `
+      <div class="mood-input custom-mood">
+        <input type="text" id="custom-mood-name" placeholder="Add Custom Mood">
+        <button onclick="app.modules.MoodTracker.addCustomMood()">Add</button>
+      </div>
+    `;
+    return inputsHtml;
+  }
+
+  addCustomMood() {
+    console.log("joe")
+    const customMoodName = document.getElementById('custom-mood-name').value;
+    if (customMoodName) {
+      this.defaultMoodTypes.push(customMoodName);
+      this.build();
+      this.render();
+    }
+  }
+
+  createMoodInput(mood) {
+    return `
+      <div class="mood-input">
+        <label for="${mood.toLowerCase()}">${mood}: </label>
+        <input type="range" id="${mood.toLowerCase()}" name="${mood.toLowerCase()}" min="1" max="10" value="${this.getMoodLevel(mood)}">
+      </div>
+    `;
+  }
+
+
+  getMoodLevel(moodName) {
+    const mood = this.moods.find(m => m.name === moodName);
+    return mood ? mood.level : 5; // Default to 5 if not set
+  }
+
+  async getData() {
+    let url = `http://${HOST}/${this.endpoint}`;
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Error: " + response.status);
+      }
+      this.moods = await response.json(); // Assuming the response is an array of mood objects
+    } catch (error) {
+      console.log("Error fetching mood data", error);
+    }
+  }
+
+  async saveMoods() {
+    this.moods = ['Happiness', 'Sadness', 'Tiredness', 'Tiredness (in a good way)'].map(mood => {
+      return {
+        name: mood,
+        level: document.getElementById(mood.toLowerCase()).value
+      };
+    });
+    console.log
+    await this.sendMoodData();
+  }
+
+  async sendMoodData() {
+    let url = `http://${HOST}/${this.endpoint}`;
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', // Corrected Content-Type
+        },
+        body: JSON.stringify(this.moods)
+      });
+      if (!response.ok) {
+        throw new Error('Error saving mood data');
+      }
+
+      console.log('Mood data saved successfully');
+    } catch (error) {
+      console.error("Couldn't save mood data", error);
+    }
+  }
+  render() {
+    const modulesContainer = document.querySelector('.modules');
+    const existingModule = document.querySelector('.' + this.className);
+
+    // Create a new module element
+    this.createModule();
+
+    if (existingModule) {
+      // Replace the existing module with the new one
+      modulesContainer.replaceChild(this.html, existingModule);
+    } else {
+      // If the module does not exist, append the new one
+      modulesContainer.appendChild(this.html);
+    }
+  }
+
+  createModule() {
+    const moduleElement = document.createElement('div');
+    moduleElement.className = `${this.className} module`;
+    moduleElement.innerHTML = this.buildMoodInputs() +
+      `<button onclick="app.modules.MoodTracker.saveMoods()">Save Moods</button>`;
+    this.html = moduleElement;
+  }
+
 }
 
 class Cookie {
@@ -711,13 +918,12 @@ function setHost() {
     HOST = "192.168.0.165:5621";
   }
   else if (isWindows && Cookie.get("debug") == "true") {
-    HOST = "127.0.0.1:5621";  
+    HOST = "127.0.0.1:5621";
   }
   else {
     HOST = "192.168.0.165:5621";
   }
 
-  // Cookie.set("host", HOST);
   return HOST;
 }
 
@@ -725,75 +931,149 @@ function setHost() {
 
 class day2day {
   constructor() {
-    this.modules = []
-    this.loadout = {
-      HabitTracker: true, // grid of habits and their entries plus notes
-      Quota: true, // monitors if your habits are on track
-      Reward: true, // the goods you get after you do your habits!!!
-      Mood: true, // questions with range inputs
-      X: true,
-      Tasks: true, // the shit 
-      Summary: true, // a summary of shit you should probably do
-      History: true, // a wider view of your entries
-      Stats: true, // some insights from your habits, mood, etc
-      Travel: true, // a travel checklist, and maybe map
-      Mantra: true, // to keep that ideal self present
-      Quotes: true, // random inspirational quotes
-      Word: true, // Word of the day
-      Baseline: true, // Keep yourself grounded
-      Highlights: true, // Upload a pic that captures the highlight of a month
-    }
+    this.modules = {}
+    this.loadout = [
+      {
+        name: "HabitTracker",
+        enabled: true,
+        class: HabitTracker,
+        serializer: Habit,
+      },
+      {
+        name: "Quota",
+        enabled: true,
+        class: Quota,
+        dependencies: ["HabitTracker"],
+      },
+      {
+        name: "Reward",
+        enabled: true,
+        class: Reward,
+      },
+      {
+        name: "MoodTracker",
+        enabled: true,
+        class: MoodTracker,
+      },
+      {
+        name: "X",
+        enabled: true,
+        class: undefined,
+      },
+      {
+        name: "Tasks",
+        enabled: true,
+        class: undefined,
+      },
+      {
+        name: "Summary",
+        enabled: true,
+        class: undefined,
+      },
+      {
+        name: "History",
+        enabled: true,
+        class: undefined,
+      },
+      {
+        name: "Stats",
+        enabled: true,
+        class: undefined,
+      },
+      {
+        name: "Travel",
+        enabled: true,
+        class: undefined,
+      },
+      {
+        name: "Mantra",
+        enabled: true,
+        class: undefined,
+      },
+      {
+        name: "Quotes",
+        enabled: true,
+        class: undefined,
+      },
+      {
+        name: "Word",
+        enabled: true,
+        class: undefined,
+      },
+      {
+        name: "Baseline",
+        enabled: true,
+        class: undefined,
+      },
+      {
+        name: "Highlights",
+        enabled: true,
+        class: undefined,
+      },
+    ];
     setHost();
   }
 
-  toggleDebug() {
-    if (Cookie.get("debug") == "false") {Cookie.set("debug", true);}
-    else {Cookie.set("debug", false);}
-    // if (HOST == "127.0.0.1:5621") {
-    //   HOST = "192.168.0.1:5621";
-    // }
-    // else {
-    //   HOST = "127.0.0.1:5621";
-    // }
-    // Cookie.set("host", HOST);
-  }
+  async initModules() {
+    const initializedModules = []; // Array to store initialized modules
 
+    for (const moduleManifest of this.loadout) {
+      console.log(moduleManifest);
 
-  async start() {
-    // Habit Tracker & Quota
-    HabitTracker.getData().then(habits => {
-      if (habits) {
-        habits = Habit.serialize(habits);
-        let ht = new HabitTracker(habits);
-        let q = new Quota(habits);
-        ht.render();
-        q.render();
-        app.modules.push(ht);
-        app.modules.push(q);
-        this.HabitTracker = ht;
-        this.Quota = q;
+      if (!moduleManifest.enabled) {
+        console.log(moduleManifest.name + " manually disabled.");
+        continue;
+      } else if (!moduleManifest.class) {
+        console.log("No class specified for " + moduleManifest.name + ". Skipping.");
+        continue;
       }
-      else { console.log("Do something to indicate habits weren't loaded"); }
-    }).then(() => {
-      // Reward
-      Reward.getTodaysReward().then(rewardUrl => {
-        if (rewardUrl) {
-          let reward = new Reward(rewardUrl);
-          app.modules.push(reward);
-          reward.render();
-          this.Reward = reward;
-        }
-        else {
-          // We really don't care if this doesn't show up for any unknown reason
-        }
-      });
 
-    }).then(() => {
-      // X.
-    });
+      let module = new moduleManifest.class();
+
+      if (module.fetchData && module.endpoint) {
+        let data = await module.getData();
+
+        if (moduleManifest.serializer) {
+          module.data = data.map(obj => {
+            const instance = new moduleManifest.serializer();
+            Object.keys(obj).forEach(key => {
+              if (instance.hasOwnProperty(key)) {
+                instance[key] = obj[key];
+              }
+            });
+            return instance;
+          });
+        } else {
+          module.data = data;
+        }
+
+        await module.build();
+      } else {
+        console.log("No external data needed for " + moduleManifest.name + ". Skipping data fetching.");
+      }
+
+      module.build();
+
+      module.name = moduleManifest.name;
+      this.modules[module.name] = module;
+      initializedModules.push(module); // Add the module to the array
+    };
+
+    await Promise.all(initializedModules); // Wait for all modules to be initialized
+    return initializedModules; // Return the array of initialized modules
   }
+
+  toggleDebug() {
+    if (Cookie.get("debug") == "false") { Cookie.set("debug", true); }
+    else { Cookie.set("debug", false); }
+  }
+
+  sortModules() {
+    // update this.modules in the order that they were declared in loadout
+  }
+
   render() {
-    this.modules.forEach(module => {
+    Object.values(this.modules).forEach(module => {
       module.render();
     });
     document.querySelector(".modules").classList.remove("hidden");
@@ -801,12 +1081,15 @@ class day2day {
 }
 
 
-
 // Init the app
 let app = new day2day();
-app.start().then(() => {
+app.initModules().then(() => {
+  console.log(app.modules.HabitTracker.data)
   app.render();
-});
+})
+// app.start().then(() => {
+//   app.render();
+// });
 
 
 

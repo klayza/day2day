@@ -174,14 +174,48 @@ def getReminders():
     reminders = db.get_data()
     return jsonify(reminders), 200
         
-    
+
 @app.route("/reminders/new")
 def newReminder():
     db = DB("reminders.json")
     reminders = db.get_data()
     return jsonify(reminders), 200
+
+
+
+# Add a route in your Flask server for handling mood data
+@app.route("/mood", methods=["GET", "POST"])
+def mood():
+    if request.method == "GET":
+        return get_mood_data()
+    elif request.method == "POST":
+        return save_mood_data()
+
+
+def get_mood_data():
+    # Retrieve mood data from a file or database
+    # This is a placeholder, you'll need to implement the actual data retrieval
+    if os.path.exists("moods.json"):
+        with open("moods.json", "r") as file:
+            data = json.load(file)
+        return jsonify(data), 200
+    else:
+        return jsonify([]), 200
+
+
+def save_mood_data():
+    data = request.get_json()
+    # Save the mood data
+    # This is a placeholder, you'll need to implement the actual data saving
+    with open("moods.json", "w") as file:
+        json.dump(data, file, indent=4)
+    return jsonify({"message": "Mood data saved successfully"}), 200
         
     
+
+# Define the get_mood_data and save_mood_data functions as per your data model
+# These functions should interact with a database or file system to retrieve and store mood data
+
 # @app.route("/x/random", methods=["POST"])
 
 
@@ -196,6 +230,13 @@ def home():
 
 
 if __name__ == "__main__":
-    if LOCATION == "windows": app.run(port=5621, debug=True)  
-    elif LOCATION == "linux": app.run(host='0.0.0.0', port=5621, debug=True) 
-    else: app.run(port=5621, debug=True)
+    extra_files = []
+    for dirname, dirs, files in os.walk('.'):
+        for filename in files:
+            filename = os.path.join(dirname, filename)
+            if os.path.isfile(filename):
+                extra_files.append(filename)
+    
+    if LOCATION == "windows": app.run(port=5621, debug=True, extra_files=extra_files)  
+    elif LOCATION == "linux": app.run(host='0.0.0.0', port=5621, debug=True, extra_files=extra_files) 
+    else: app.run(port=5621, debug=True, extra_files=extra_files)
